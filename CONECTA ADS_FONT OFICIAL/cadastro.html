@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Conecta ADS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Conecta <span>ADS</span></h1>
+            <p>Crie sua conta de estudante</p>
+            <form>
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" placeholder="Digite seu nome" required>
+                <label for="ra">RA do aluno</label>
+                <input type="text" id="ra" placeholder="Digite seu RA" required>
+                <label for="senha">Crie uma senha</label>
+                <input type="password" id="senha" placeholder="Digite sua senha" required>
+                <label for="confirmar-senha">Confirme sua senha</label>
+                <input type="password" id="confirmar-senha" placeholder="Repita sua senha" required>
+              <button type="button" onclick="cadastrarAluno()">
+    Cadastrar
+</button>
+            </form>
+            <p class="register-link">
+                Já possui uma conta?
+                <a href="login.html">Entrar</a>
+            </p>
+        </div>
+    </div>
+<script>
+function cadastrarAluno() {
+    const nome = document.querySelector("#nome").value;
+    const ra = document.querySelector("#ra").value;
+    const senha = document.querySelector("#senha").value;
+    const confirmarSenha = document.querySelector("#confirmar-senha").value;
+    if (nome === "" || ra === "" || senha === "" || confirmarSenha === "") {
+        alert("Preencha todos os campos!");
+        return;
+    }
+    if (senha !== confirmarSenha) {
+        alert("As senhas não são iguais!");
+        return;
+    }
+    const aluno = {
+        nome: nome,
+        ra: ra,
+        senha: senha
+    };
+    localStorage.setItem("aluno", JSON.stringify(aluno));
+    alert("Cadastro realizado com sucesso!");
+    window.location.href = "login.html";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Modelagem de Dados</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Conecta <span>ADS</span></h2>
+            <nav>
+                <a href="index.html">🏠 Início</a>
+                <a href="estudos.html">📚 Estudos</a>
+                <a href="#">📄 Trabalhos</a>
+                <a href="quiz.html" class="active">📝 Quiz</a>
+                <a href="#">👤 Meu perfil</a>
+            </nav>
+            <div class="sidebar-bottom">
+                <a href="#">⚙️ Configurações</a>
+                <a href="login.html">🚪 Sair</a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header>
+                <div>
+                    <h1>Quiz - Modelagem de Dados 🗄️</h1>
+                    <p>Teste seus conhecimentos sobre a disciplina.</p>
+                </div>
+                <div class="profile">👤</div>
+            </header>
+            <section class="section">
+                <div id="quiz">
+                    <h2 id="pergunta">Questão 1</h2>
+                    <div id="alternativas"></div>
+                    <button type="button" id="proximo">Próxima questão</button>
+                </div>
+                <div id="resultado" style="display: none;">
+                    <h2>Resultado 🎉</h2>
+                    <p id="pontuacao"></p>
+                    <button type="button" id="refazer">Refazer quiz</button>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+        const perguntasQuiz = [
+            {
+                pergunta: "O que é uma entidade na modelagem de dados?",
+                alternativas: [
+                    "Um objeto ou elemento sobre o qual são armazenadas informações",
+                    "Um tipo de programa de computador",
+                    "Uma linguagem de programação",
+                    "Um comando do banco de dados"
+                ],
+                resposta: 0
+            },
+            {
+                pergunta: "O que é um atributo?",
+                alternativas: [
+                    "Uma ligação entre duas tabelas",
+                    "Uma característica ou informação de uma entidade",
+                    "Um programa utilizado para criar bancos de dados",
+                    "Um tipo de relacionamento"
+                ],
+                resposta: 1
+            },
+            {
+                pergunta: "O que representa um relacionamento no modelo entidade-relacionamento?",
+                alternativas: [
+                    "Uma característica de uma entidade",
+                    "Uma tabela do banco de dados",
+                    "A associação entre entidades",
+                    "Um tipo de atributo"
+                ],
+                resposta: 2
+            }
+        ];
+        let numeroQuestao = 0;
+        let pontosQuiz = 0;
+        let respondeu = false;
+        const perguntaElemento = document.getElementById("pergunta");
+        const alternativasElemento = document.getElementById("alternativas");
+        const botaoProximo = document.getElementById("proximo");
+        const quizElemento = document.getElementById("quiz");
+        const resultadoElemento = document.getElementById("resultado");
+        const pontuacaoElemento = document.getElementById("pontuacao");
+        const botaoRefazer = document.getElementById("refazer");
+        function mostrarQuestao() {
+            respondeu = false;
+            const questao = perguntasQuiz[numeroQuestao];
+            perguntaElemento.textContent = `${numeroQuestao + 1}. ${questao.pergunta}`;
+            alternativasElemento.innerHTML = "";
+            questao.alternativas.forEach((alternativa, indice) => {
+                const botao = document.createElement("button");
+
+                botao.type = "button";
+                botao.textContent = `${String.fromCharCode(65 + indice)}) ${alternativa}`;
+
+                botao.addEventListener("click", function() {
+                    if (respondeu) {
+                        return;
+                    }
+                    respondeu = true;
+
+                    if (indice === questao.resposta) {
+                        pontosQuiz++;
+                        botao.style.backgroundColor = "#4CAF50";
+                        botao.style.color = "white";
+                    } else {
+                        botao.style.backgroundColor = "#F44336";
+                        botao.style.color = "white";
+                    }
+                });
+                alternativasElemento.appendChild(botao);
+            });
+            if (numeroQuestao === perguntasQuiz.length - 1) {
+                botaoProximo.textContent = "Ver resultado";
+            } else {
+                botaoProximo.textContent = "Próxima questão";
+            }
+        }
+        botaoProximo.addEventListener("click", function() {
+            if (!respondeu) {
+                alert("Escolha uma alternativa!");
+                return;
+            }
+            if (numeroQuestao < perguntasQuiz.length - 1) {
+                numeroQuestao++;
+                mostrarQuestao();
+            } else {
+                quizElemento.style.display = "none";
+                resultadoElemento.style.display = "block";
+                pontuacaoElemento.textContent = `Você acertou ${pontosQuiz} de ${perguntasQuiz.length} questões!`;
+            }
+        });
+        botaoRefazer.addEventListener("click", function() {
+            numeroQuestao = 0;
+            pontosQuiz = 0;
+            quizElemento.style.display = "block";
+            resultadoElemento.style.display = "none";
+            mostrarQuestao();
+        });
+        mostrarQuestao();
+    </script>
+</body>
+</html>

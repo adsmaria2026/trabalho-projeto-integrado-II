@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - Conecta ADS</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Conecta <span>ADS</span></h1>
+            <p>Entre na sua conta</p>
+            <form>
+                <label for="ra">RA do aluno</label>
+                <input
+                    type="text"
+                    id="ra"
+                    placeholder="Digite seu RA"
+                    required
+                >
+                <label for="senha">Senha</label>
+                <input
+                    type="password"
+                    id="senha"
+                    placeholder="Digite sua senha"
+                    required
+                >
+                <button type="button" onclick="fazerLogin()">
+                    Entrar
+                </button>
+            </form>
+            <p class="register-link">
+                Ainda não tem uma conta?
+                <a href="cadastro.html">Cadastre-se</a>
+            </p>
+        </div>
+    </div>
+    <script>
+        function fazerLogin() {
+            const raDigitado = document.querySelector("#ra").value;
+            const senhaDigitada = document.querySelector("#senha").value;
+            const alunoSalvo = JSON.parse(localStorage.getItem("aluno"));
+            if (!alunoSalvo) {
+                alert("Nenhum aluno cadastrado!");
+                return;
+            }
+            if (
+                raDigitado === alunoSalvo.ra &&
+                senhaDigitada === alunoSalvo.senha
+            ) {
+                alert("Login realizado com sucesso!");
+                window.location.href = "index.html";
+            } else {
+                alert("RA ou senha incorretos!");
+            }
+        }
+    </script>
+</body>
+</html>

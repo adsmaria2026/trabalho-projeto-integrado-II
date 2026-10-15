@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu perfil - Conecta ADS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Conecta <span>ADS</span></h2>
+            <nav>
+                <a href="index.html">🏠 Início</a>
+                <a href="estudos.html">📚 Estudos</a>
+                <a href="trabalhos.html">📄 Trabalhos</a>
+                <a href="quiz.html">📝 Quiz</a>
+                <a href="perfil.html" class="active">👤 Meu perfil</a>
+            </nav>
+            <div class="sidebar-bottom">
+                <a href="perfil.html">⚙️ Configurações</a>
+                <a href="login.html">🚪 Sair</a>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header>
+                <div>
+                    <h1>Meu perfil 👤</h1>
+                    <p>Confira suas informações de estudante.</p>
+                </div>
+                <div class="profile">👤</div>
+            </header>
+            <section class="section">
+                <div class="material">
+                    <h2 id="nomeAluno" style="color:#243b64; margin-bottom:18px;">Estudante</h2>
+                    <p><strong>RA:</strong> <span id="raAluno">Não informado</span></p>
+                    <p style="margin-top:12px;"><strong>Curso:</strong> Análise e Desenvolvimento de Sistemas</p>
+                    <p style="margin-top:12px;"><strong>Semestre:</strong> 2º semestre</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+        const aluno = JSON.parse(localStorage.getItem("aluno"));
+        if (aluno) {
+            document.getElementById("nomeAluno").textContent = aluno.nome || "Estudante";
+            document.getElementById("raAluno").textContent = aluno.ra || "Não informado";
+        } else {
+            document.getElementById("nomeAluno").textContent = "Nenhum estudante cadastrado";
+        }
+    </script>
+</body>
+</html>
