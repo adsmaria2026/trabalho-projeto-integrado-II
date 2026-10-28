@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,18 +11,21 @@
     <div class="container">
         <aside class="sidebar">
             <h2>Conecta <span>ADS</span></h2>
+
             <nav>
                 <a href="index.html">🏠 Início</a>
                 <a href="estudos.html" class="active">📚 Estudos</a>
-                <a href="#">📄 Trabalhos</a>
-                <a href="#">📝 Dicas para provas</a>
-                <a href="#">👤 Meu perfil</a>
+                <a href="trabalhos.html">📄 Trabalhos</a>
+                <a href="quiz.html">📝 Quiz</a>
+                <a href="perfil.html">👤 Meu perfil</a>
             </nav>
+
             <div class="sidebar-bottom">
                 <a href="#">⚙️ Configurações</a>
                 <a href="login.html">🚪 Sair</a>
             </div>
         </aside>
+
         <main class="main-content">
             <header>
                 <div>
@@ -30,32 +34,85 @@
                 </div>
                 <div class="profile">👤</div>
             </header>
+
             <section class="section">
                 <h2>Resumos</h2>
-                <div class="materials">
-                    <div class="material">
-                        <h3>Introdução aos Sistemas Operacionais</h3>
-                        <p>Conceitos básicos, funções do sistema operacional e gerenciamento dos recursos do computador.</p>
-                     <a href="resumo-sistema-operacionais.html">Visualizar resumo</a>
-                    </div>
-                    <div class="material">
-                        <h3>Processos e Threads</h3>
-                        <p>Resumo sobre processos, threads, estados dos processos e escalonamento.</p>
-                        <button>Visualizar resumo</button>
-                    </div>
+
+                <div class="materials" id="lista-resumos">
+                    <p>Carregando resumos...</p>
                 </div>
             </section>
+
             <section class="section">
                 <h2>Exercícios</h2>
+
                 <div class="materials">
                     <div class="material">
                         <h3>Exercícios de Sistemas Operacionais</h3>
                         <p>Questões para revisar os principais conceitos da disciplina.</p>
-                 <a href="exercicios-sistemas-operacionais.html">Ver exercícios</a>
+                        <a href="exercicios-sistemas-operacionais.html">Ver exercícios</a>
                     </div>
                 </div>
             </section>
         </main>
     </div>
+
+    <script>
+        async function carregarResumos() {
+            const lista = document.getElementById("lista-resumos");
+
+            try {
+                const resposta = await fetch("/api/materiais/1");
+
+                if (!resposta.ok) {
+                    throw new Error("Não foi possível buscar os materiais.");
+                }
+
+                const materiais = await resposta.json();
+
+                lista.innerHTML = "";
+
+                const resumos = materiais.filter(
+                    material => material.tipo.toLowerCase() === "resumo"
+                );
+
+                if (resumos.length === 0) {
+                    lista.innerHTML = "<p>Nenhum resumo cadastrado ainda.</p>";
+                    return;
+                }
+
+                resumos.forEach(material => {
+                    const card = document.createElement("div");
+                    card.className = "material";
+
+                    const titulo = document.createElement("h3");
+                    titulo.textContent = material.titulo;
+
+                    const descricao = document.createElement("p");
+                    descricao.textContent = material.descricao || "Resumo compartilhado por um estudante.";
+
+                    const autor = document.createElement("p");
+                    autor.textContent = "Compartilhado por: " + material.autor;
+
+                    const link = document.createElement("a");
+                    link.href = material.caminho_arquivo;
+                    link.textContent = "Visualizar resumo";
+
+                    card.appendChild(titulo);
+                    card.appendChild(descricao);
+                    card.appendChild(autor);
+                    card.appendChild(link);
+
+                    lista.appendChild(card);
+                });
+
+            } catch (erro) {
+                console.error("Erro ao carregar resumos:", erro);
+                lista.innerHTML = "<p>Não foi possível carregar os resumos. Verifique se o servidor está ligado.</p>";
+            }
+        }
+
+        carregarResumos();
+    </script>
 </body>
 </html>

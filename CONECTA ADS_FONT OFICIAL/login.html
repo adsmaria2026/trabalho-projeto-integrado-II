@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -13,48 +14,83 @@
         <div class="login-box">
             <h1>Conecta <span>ADS</span></h1>
             <p>Entre na sua conta</p>
-            <form>
+
+            <form onsubmit="event.preventDefault(); fazerLogin();">
                 <label for="ra">RA do aluno</label>
                 <input
                     type="text"
                     id="ra"
                     placeholder="Digite seu RA"
+                    autocomplete="username"
                     required
                 >
+
                 <label for="senha">Senha</label>
                 <input
                     type="password"
                     id="senha"
                     placeholder="Digite sua senha"
+                    autocomplete="current-password"
                     required
                 >
-                <button type="button" onclick="fazerLogin()">
+
+                <button type="submit">
                     Entrar
                 </button>
             </form>
+
             <p class="register-link">
                 Ainda não tem uma conta?
                 <a href="cadastro.html">Cadastre-se</a>
             </p>
         </div>
     </div>
+
     <script>
-        function fazerLogin() {
-            const raDigitado = document.querySelector("#ra").value;
-            const senhaDigitada = document.querySelector("#senha").value;
-            const alunoSalvo = JSON.parse(localStorage.getItem("aluno"));
-            if (!alunoSalvo) {
-                alert("Nenhum aluno cadastrado!");
+        async function fazerLogin() {
+            const ra = document.querySelector("#ra").value.trim();
+            const senha = document.querySelector("#senha").value;
+
+            if (!ra || !senha) {
+                alert("Preencha o RA e a senha!");
                 return;
             }
-            if (
-                raDigitado === alunoSalvo.ra &&
-                senhaDigitada === alunoSalvo.senha
-            ) {
+
+            try {
+                const resposta = await fetch("/api/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        ra: ra,
+                        senha: senha
+                    })
+                });
+
+                const resultado = await resposta.json();
+
+                if (!resposta.ok) {
+                    alert(resultado.mensagem);
+                    return;
+                }
+
+                localStorage.setItem(
+                    "alunoLogado",
+                    JSON.stringify(resultado.aluno)
+                );
+
                 alert("Login realizado com sucesso!");
+
                 window.location.href = "index.html";
-            } else {
-                alert("RA ou senha incorretos!");
+
+            } catch (erro) {
+                console.error("Erro no login:", erro);
+
+                alert(
+                    "Não foi possível conectar ao servidor. " +
+                    "Verifique se o servidor está iniciado."
+                );
             }
         }
     </script>

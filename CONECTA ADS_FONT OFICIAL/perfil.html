@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,6 +11,7 @@
     <div class="container">
         <aside class="sidebar">
             <h2>Conecta <span>ADS</span></h2>
+
             <nav>
                 <a href="index.html">🏠 Início</a>
                 <a href="estudos.html">📚 Estudos</a>
@@ -17,37 +19,119 @@
                 <a href="quiz.html">📝 Quiz</a>
                 <a href="perfil.html" class="active">👤 Meu perfil</a>
             </nav>
+
             <div class="sidebar-bottom">
                 <a href="perfil.html">⚙️ Configurações</a>
-                <a href="login.html">🚪 Sair</a>
+                <a href="#" onclick="sairDaConta(); return false;">🚪 Sair</a>
             </div>
         </aside>
+
         <main class="main-content">
             <header>
                 <div>
                     <h1>Meu perfil 👤</h1>
                     <p>Confira suas informações de estudante.</p>
                 </div>
+
                 <div class="profile">👤</div>
             </header>
+
             <section class="section">
                 <div class="material">
-                    <h2 id="nomeAluno" style="color:#243b64; margin-bottom:18px;">Estudante</h2>
-                    <p><strong>RA:</strong> <span id="raAluno">Não informado</span></p>
-                    <p style="margin-top:12px;"><strong>Curso:</strong> Análise e Desenvolvimento de Sistemas</p>
-                    <p style="margin-top:12px;"><strong>Semestre:</strong> 2º semestre</p>
+                    <h2 id="nomeAluno" style="color:#243b64; margin-bottom:18px;">
+                        Carregando perfil...
+                    </h2>
+
+                    <p>
+                        <strong>RA:</strong>
+                        <span id="raAluno">Carregando...</span>
+                    </p>
+
+                    <p style="margin-top:12px;">
+                        <strong>Curso:</strong>
+                        Análise e Desenvolvimento de Sistemas
+                    </p>
+
+                    <p style="margin-top:12px;">
+                        <strong>Semestre:</strong>
+                        2º semestre
+                    </p>
                 </div>
             </section>
         </main>
     </div>
+
     <script>
-        const aluno = JSON.parse(localStorage.getItem("aluno"));
-        if (aluno) {
-            document.getElementById("nomeAluno").textContent = aluno.nome || "Estudante";
-            document.getElementById("raAluno").textContent = aluno.ra || "Não informado";
-        } else {
-            document.getElementById("nomeAluno").textContent = "Nenhum estudante cadastrado";
+        function sairDaConta() {
+    localStorage.removeItem("alunoLogado");
+    window.location.href = "login.html";
+}
+function verificarLogin() {
+    const alunoLogado = localStorage.getItem("alunoLogado");
+
+    if (!alunoLogado) {
+        window.location.replace("login.html");
+        return false;
+    }
+
+    return true;
+}
+        async function carregarPerfil() {
+            const nomeElemento = document.getElementById("nomeAluno");
+            const raElemento = document.getElementById("raAluno");
+
+            // Recupera o estudante que entrou pelo login
+            let alunoLogado;
+
+            try {
+                alunoLogado = JSON.parse(
+                    localStorage.getItem("alunoLogado")
+                );
+            } catch (erro) {
+                alunoLogado = null;
+            }
+
+            if (!alunoLogado || !alunoLogado.ra) {
+                nomeElemento.textContent = "Faça login para ver seu perfil";
+                raElemento.textContent = "Não informado";
+                return;
+            }
+
+            try {
+                // Busca os dados atualizados no servidor e no MySQL
+                const resposta = await fetch(
+                    `/api/perfil/${encodeURIComponent(alunoLogado.ra)}`
+                );
+
+                const dados = await resposta.json();
+
+                if (!resposta.ok) {
+                    nomeElemento.textContent =
+                        dados.mensagem || "Não foi possível carregar o perfil";
+
+                    raElemento.textContent = "Não informado";
+                    return;
+                }
+
+                nomeElemento.textContent =
+                    dados.nome_completo || "Estudante";
+
+                raElemento.textContent =
+                    dados.ra || "Não informado";
+
+            } catch (erro) {
+                console.error("Erro ao carregar o perfil:", erro);
+
+                nomeElemento.textContent =
+                    "Não foi possível carregar o perfil";
+
+                raElemento.textContent = "Tente novamente";
+            }
         }
+
+        if (verificarLogin()) {
+    carregarPerfil();
+}
     </script>
 </body>
 </html>

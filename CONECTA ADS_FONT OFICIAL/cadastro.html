@@ -30,29 +30,46 @@
             </p>
         </div>
     </div>
+
 <script>
-function cadastrarAluno() {
-    const nome = document.querySelector("#nome").value;
-    const ra = document.querySelector("#ra").value;
+async function cadastrarAluno() {
+    const nome = document.querySelector("#nome").value.trim();
+    const ra = document.querySelector("#ra").value.trim();
     const senha = document.querySelector("#senha").value;
     const confirmarSenha = document.querySelector("#confirmar-senha").value;
-    if (nome === "" || ra === "" || senha === "" || confirmarSenha === "") {
+
+    if (!nome || !ra || !senha || !confirmarSenha) {
         alert("Preencha todos os campos!");
         return;
     }
+
     if (senha !== confirmarSenha) {
         alert("As senhas não são iguais!");
         return;
     }
-    const aluno = {
-        nome: nome,
-        ra: ra,
-        senha: senha
-    };
-    localStorage.setItem("aluno", JSON.stringify(aluno));
-    alert("Cadastro realizado com sucesso!");
-    window.location.href = "login.html";
+
+    try {
+        const resposta = await fetch("/api/cadastro", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ nome, ra, senha })
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok) {
+            alert(resultado.mensagem);
+            return;
+        }
+
+        alert("Cadastro realizado com sucesso!");
+        window.location.href = "login.html";
+
+    } catch (erro) {
+        alert("Não foi possível conectar ao servidor.");
+        console.error(erro);
+    }
 }
 </script>
-</body>
-</html>

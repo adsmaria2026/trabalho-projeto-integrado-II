@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -13,15 +14,16 @@
             <nav>
                 <a href="index.html">🏠 Início</a>
                 <a href="estudos.html" class="active">📚 Estudos</a>
-                <a href="#">📄 Trabalhos</a>
-                <a href="#">📝 Dicas para provas</a>
-                <a href="#">👤 Meu perfil</a>
+                <a href="trabalhos.html">📄 Trabalhos</a>
+                <a href="quiz.html">📝 Quiz</a>
+                <a href="perfil.html">👤 Meu perfil</a>
             </nav>
             <div class="sidebar-bottom">
                 <a href="#">⚙️ Configurações</a>
                 <a href="login.html">🚪 Sair</a>
             </div>
         </aside>
+
         <main class="main-content">
             <header>
                 <div>
@@ -30,31 +32,156 @@
                 </div>
                 <div class="profile">👤</div>
             </header>
+
             <section class="section">
                 <h2>Questões</h2>
-                <div class="material">
-                    <h3>1. Qual é o valor lógico de uma proposição verdadeira?</h3>
-                    <p>A) Falso</p>
-                    <p>B) Verdadeiro</p>
-                    <p>C) Nulo</p>
-                    <p>D) Indefinido</p>
-                </div>
-                <div class="material">
-                    <h3>2. Qual operador lógico representa a negação?</h3>
-                    <p>A) E</p>
-                    <p>B) OU</p>
-                    <p>C) NÃO</p>
-                    <p>D) SE</p>
-                </div>
-                <div class="material">
-                    <h3>3. O que é um conjunto?</h3>
-                    <p>A) Uma coleção de elementos</p>
-                    <p>B) Um programa de computador</p>
-                    <p>C) Um sistema operacional</p>
-                    <p>D) Uma linguagem de programação</p>
+                <div id="lista-questoes">
+                    <p>Carregando questões...</p>
                 </div>
             </section>
         </main>
     </div>
+
+    <script>
+        async function carregarQuestoes() {
+            const lista = document.getElementById("lista-questoes");
+
+            try {
+                const resposta = await fetch("/api/perguntas-quiz/2");
+
+                if (!resposta.ok) {
+                    throw new Error("Erro ao buscar questões.");
+                }
+
+                const perguntas = await resposta.json();
+                lista.innerHTML = "";
+
+                if (perguntas.length === 0) {
+                    lista.textContent = "Nenhuma questão cadastrada ainda.";
+                    return;
+                }
+
+                perguntas.forEach((pergunta, indice) => {
+                    const card = document.createElement("div");
+                    card.className = "material";
+
+                    const titulo = document.createElement("h3");
+                    titulo.textContent =
+                        (indice + 1) + ". " + pergunta.enunciado;
+
+                    card.appendChild(titulo);
+
+                    const alternativas = [
+                        ["A", pergunta.alternativa_a],
+                        ["B", pergunta.alternativa_b],
+                        ["C", pergunta.alternativa_c],
+                        ["D", pergunta.alternativa_d]
+                    ];
+
+                    alternativas.forEach(([letra, texto]) => {
+                        const label = document.createElement("label");
+
+                        label.style.display = "block";
+                        label.style.margin = "10px 0";
+                        label.style.cursor = "pointer";
+
+                        const radio = document.createElement("input");
+                        radio.type = "radio";
+                        radio.name = "questao-" + pergunta.id_pergunta;
+                        radio.value = letra;
+
+                        label.appendChild(radio);
+                        label.appendChild(
+                            document.createTextNode(" " + letra + ") " + texto)
+                        );
+
+                        card.appendChild(label);
+                    });
+
+                    const botao = document.createElement("button");
+                    botao.type = "button";
+                    botao.textContent = "Conferir resposta";
+
+                    const resultado = document.createElement("p");
+
+                    botao.addEventListener("click", async () => {
+                        const selecionada = card.querySelector(
+                            'input[name="questao-' +
+                            pergunta.id_pergunta +
+                            '"]:checked'
+                        );
+
+                        if (!selecionada) {
+                            resultado.textContent =
+                                "Selecione uma alternativa primeiro.";
+                            return;
+                        }
+
+                        botao.disabled = true;
+                        botao.textContent = "Conferindo...";
+                        resultado.textContent = "";
+
+                        try {
+                            const respostaConferencia = await fetch(
+                                "/api/conferir-resposta",
+                                {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        id_pergunta: pergunta.id_pergunta,
+                                        alternativa_escolhida: selecionada.value
+                                    })
+                                }
+                            );
+
+                            const dados = await respostaConferencia.json();
+
+                            if (!respostaConferencia.ok) {
+                                throw new Error(
+                                    dados.mensagem ||
+                                    "Não foi possível conferir a resposta."
+                                );
+                            }
+
+                            if (dados.correta) {
+                                resultado.textContent =
+                                    "Correto! 🎉 " + dados.explicacao;
+                            } else {
+                                resultado.textContent =
+                                    "Resposta incorreta. Tente revisar o conteúdo. " +
+                                    dados.explicacao;
+                            }
+
+                            card.querySelectorAll("input").forEach((radio) => {
+                                radio.disabled = true;
+                            });
+                        } catch (erro) {
+                            resultado.textContent =
+                                erro.message ||
+                                "Erro ao conferir. Verifique se o servidor está ligado.";
+
+                            botao.disabled = false;
+                        } finally {
+                            botao.textContent = "Resposta conferida";
+                        }
+                    });
+
+                    card.appendChild(botao);
+                    card.appendChild(resultado);
+                    lista.appendChild(card);
+                });
+            } catch (erro) {
+                console.error(erro);
+
+                lista.textContent =
+                    "Não foi possível carregar as questões. " +
+                    "Verifique se o servidor está ligado.";
+            }
+        }
+
+        carregarQuestoes();
+    </script>
 </body>
 </html>

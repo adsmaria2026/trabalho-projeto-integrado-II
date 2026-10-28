@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -13,15 +14,16 @@
             <nav>
                 <a href="index.html">🏠 Início</a>
                 <a href="estudos.html" class="active">📚 Estudos</a>
-                <a href="#">📄 Trabalhos</a>
-                <a href="#">📝 Dicas para provas</a>
-                <a href="#">👤 Meu perfil</a>
+                <a href="trabalhos.html">📄 Trabalhos</a>
+                <a href="quiz.html">📝 Quiz</a>
+                <a href="perfil.html">👤 Meu perfil</a>
             </nav>
             <div class="sidebar-bottom">
                 <a href="#">⚙️ Configurações</a>
                 <a href="login.html">🚪 Sair</a>
             </div>
         </aside>
+
         <main class="main-content">
             <header>
                 <div>
@@ -30,32 +32,119 @@
                 </div>
                 <div class="profile">👤</div>
             </header>
+
             <section class="section">
                 <h2>Resumos</h2>
-                <div class="materials">
-                    <div class="material">
-                        <h3>Lógica Proposicional</h3>
-                        <p>Proposições, valores lógicos, conectivos e tabelas-verdade.</p>
-                      <a href="resumo-logica-matematica.html">Visualizar resumo</a>
-                    </div>
-                    <div class="material">
-                        <h3>Conjuntos</h3>
-                        <p>Conceitos de conjuntos, união, interseção e diferença.</p>
-                      <a href="resumo-logica-matematica.html">Visualizar resumo</a>
-                    </div>
+                <div class="materials" id="lista-resumos">
+                    <p>Carregando resumos...</p>
                 </div>
             </section>
+
             <section class="section">
                 <h2>Exercícios</h2>
-                <div class="materials">
+                <div class="materials" id="lista-exercicios">
                     <div class="material">
                         <h3>Exercícios de Lógica</h3>
                         <p>Questões para revisar proposições e operações lógicas.</p>
-                    <a href="exercicios-logica-matematica.html">Visualizar exercícios</a>
+                        <a href="exercicios-logica-matematica.html">Visualizar exercícios</a>
                     </div>
                 </div>
             </section>
         </main>
     </div>
+
+    <script>
+        async function carregarMateriais() {
+            const listaResumos = document.getElementById("lista-resumos");
+            const listaExercicios = document.getElementById("lista-exercicios");
+
+            try {
+                const resposta = await fetch("/api/materiais/2");
+
+                if (!resposta.ok) {
+                    throw new Error("Não foi possível buscar os materiais.");
+                }
+
+                const materiais = await resposta.json();
+
+                listaResumos.innerHTML = "";
+
+                const resumos = materiais.filter(
+                    material => material.tipo.toLowerCase() === "resumo"
+                );
+
+                if (resumos.length === 0) {
+                    listaResumos.innerHTML = "<p>Nenhum resumo cadastrado ainda.</p>";
+                } else {
+                    resumos.forEach(material => {
+                        const card = document.createElement("div");
+                        card.className = "material";
+
+                        const titulo = document.createElement("h3");
+                        titulo.textContent = material.titulo;
+
+                        const descricao = document.createElement("p");
+                        descricao.textContent = material.descricao || "Resumo compartilhado por um estudante.";
+
+                        const autor = document.createElement("p");
+                        autor.textContent = "Compartilhado por: " + material.autor;
+
+                        const link = document.createElement("a");
+                        link.href = material.caminho_arquivo;
+                        link.textContent = "Visualizar resumo";
+
+                        card.appendChild(titulo);
+                        card.appendChild(descricao);
+                        card.appendChild(autor);
+                        card.appendChild(link);
+
+                        listaResumos.appendChild(card);
+                    });
+                }
+
+                const exercicios = materiais.filter(
+                    material => material.tipo.toLowerCase() === "exercicio" ||
+                                material.tipo.toLowerCase() === "exercício" ||
+                                material.tipo.toLowerCase() === "exercicios" ||
+                                material.tipo.toLowerCase() === "exercícios"
+                );
+
+                if (exercicios.length > 0) {
+                    listaExercicios.innerHTML = "";
+
+                    exercicios.forEach(material => {
+                        const card = document.createElement("div");
+                        card.className = "material";
+
+                        const titulo = document.createElement("h3");
+                        titulo.textContent = material.titulo;
+
+                        const descricao = document.createElement("p");
+                        descricao.textContent = material.descricao || "Exercícios compartilhados por um estudante.";
+
+                        const autor = document.createElement("p");
+                        autor.textContent = "Compartilhado por: " + material.autor;
+
+                        const link = document.createElement("a");
+                        link.href = material.caminho_arquivo;
+                        link.textContent = "Visualizar exercícios";
+
+                        card.appendChild(titulo);
+                        card.appendChild(descricao);
+                        card.appendChild(autor);
+                        card.appendChild(link);
+
+                        listaExercicios.appendChild(card);
+                    });
+                }
+
+            } catch (erro) {
+                console.error("Erro ao carregar materiais:", erro);
+                listaResumos.innerHTML = "<p>Não foi possível carregar os resumos. Verifique se o servidor está ligado.</p>";
+            }
+        }
+
+        carregarMateriais();
+    </script>
 </body>
 </html>
