@@ -470,6 +470,8 @@ app.get("/api/perfil/:ra", async (req, res) => {
 });
 
 // Iniciar o servidor por último
-app.listen(3000, () => {
-    console.log("Servidor iniciado em http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Servidor iniciado na porta ${PORT}`);
 });
