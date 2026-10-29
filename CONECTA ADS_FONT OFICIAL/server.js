@@ -6,12 +6,18 @@ require("dotenv").config();
 
 const app = express();
 
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Abrir o cadastro ao acessar a página inicial
+app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/cadastro.html");
+});
+
 app.use(express.static(__dirname));
 
-// Criar conexão com o MySQL
-
+ // Criar conexão com o MySQL
 async function conectarBanco() {
     return mysql.createConnection({
         host: process.env.DB_HOST,
@@ -25,7 +31,6 @@ async function conectarBanco() {
         connectTimeout: 20000
     });
 }
-
 
 // Teste do servidor
 app.get("/teste", (req, res) => {
