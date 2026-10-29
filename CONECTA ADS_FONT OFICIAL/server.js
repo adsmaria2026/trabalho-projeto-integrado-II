@@ -11,14 +11,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 // Criar conexão com o MySQL
+
 async function conectarBanco() {
     return mysql.createConnection({
         host: process.env.DB_HOST,
+        port: Number(process.env.DB_PORT),
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME
+        database: process.env.DB_NAME,
+        ssl: {
+            rejectUnauthorized: false
+        },
+        connectTimeout: 20000
     });
 }
+
 
 // Teste do servidor
 app.get("/teste", (req, res) => {
