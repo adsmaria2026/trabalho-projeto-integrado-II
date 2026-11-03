@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Abrir o cadastro ao acessar a página inicial
 app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/cadastro.html");
+    res.sendFile(__dirname + "/index.html");
 });
 
 app.use(express.static(__dirname));
