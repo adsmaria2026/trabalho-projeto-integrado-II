@@ -4,83 +4,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Início - Conecta ADS</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    <title>Conecta ADS - Acesso</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #343b50, #f58220);
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 850px;
+            padding: 50px 40px;
+            border-radius: 18px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .logo {
+            color: #203b63;
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
+
+        .logo span {
+            color: #f58220;
+        }
+
+        .titulo {
+            color: #203b63;
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .subtitulo {
+            color: #777;
+            margin-bottom: 35px;
+            line-height: 1.5;
+        }
+
+        .opcoes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 14px;
+            padding: 30px 22px;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .icone {
+            font-size: 45px;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            color: #203b63;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 42px;
+            margin-bottom: 22px;
+        }
+
+        .botao {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            background: #f58220;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 12px;
+            transition: 0.2s;
+        }
+
+        .botao:hover {
+            background: #df7015;
+        }
+
+        .link-login {
+            color: #203b63;
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .link-login:hover {
+            color: #f58220;
+        }
+
+        .rodape {
+            color: #999;
+            font-size: 12px;
+            margin-top: 35px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 35px 22px;
+            }
+
+            .opcoes {
+                grid-template-columns: 1fr;
+            }
+
+            .logo {
+                font-size: 32px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
 
-        <!-- MENU LATERAL -->
-        <aside class="sidebar">
-            <h2>Conecta <span>ADS</span></h2>
+    <main class="container">
 
-            <nav>
-                <a href="index.html" class="active">🏠 Início</a>
-                <a href="estudos.html">📚 Estudos</a>
-                <a href="trabalhos.html">📄 Trabalhos</a>
-                <a href="quiz.html">📝 Quiz</a>
-                <a href="perfil.html">👤 Meu perfil</a>
-            </nav>
+        <h1 class="logo">Conecta <span>ADS</span></h1>
 
-            <div class="sidebar-bottom">
-                <a href="perfil.html">⚙️ Configurações</a>
-                <a href="login.html">🚪 Sair</a>
-            </div>
-        </aside>
+        <h2 class="titulo">Bem-vindo ao Conecta ADS!</h2>
 
-        <!-- CONTEÚDO PRINCIPAL -->
-        <main class="main-content">
-            <header>
-                <div>
-                    <h1>Olá, estudante! 👋</h1>
-                    <p>Bem-vindo ao Conecta ADS.</p>
-                </div>
+        <p class="subtitulo">
+            Aprenda, compartilhe e evolua.
+            Escolha como deseja acessar a plataforma.
+        </p>
 
-                <div class="profile">
-                    👤
-                </div>
-            </header>
+        <section class="opcoes">
 
-            <!-- BANNER PRINCIPAL -->
-            <section class="welcome-card">
-                <h2>Aprenda, compartilhe e evolua!</h2>
+            <!-- ÁREA DO ESTUDANTE -->
+            <div class="card">
+
+                <div class="icone">🎓</div>
+
+                <h2>Sou estudante</h2>
+
                 <p>
-                    Encontre conhecimento, compartilhe experiências
-                    e evolua junto com outros estudantes de ADS.
+                    Acesse materiais de estudo, trabalhos
+                    compartilhados e quizzes.
                 </p>
-            </section>
 
-            <!-- DICAS PARA PROVAS -->
-            <section class="section">
-                <h2>Dicas para provas 📝</h2>
+                <a href="cadastro.html" class="botao">
+                    Criar conta
+                </a>
 
-                <div class="materials">
-                    <div class="material">
-                        <h3>Como se preparar para uma prova</h3>
-                        <p>
-                            Organize seus estudos, revise os conteúdos
-                            e pratique exercícios.
-                        </p>
-                    </div>
+                <a href="login.html" class="link-login">
+                    Já tenho cadastro
+                </a>
 
-                    <div class="material">
-                        <h3>Revise os conteúdos importantes</h3>
-                        <p>
-                            Releia seus resumos.
-                        </p>
-                    </div>
+            </div>
 
-                    <div class="material">
-                        <h3>Estude com outros alunos</h3>
-                        <p>
-                            Compartilhe conhecimentos e aprenda
-                            com seus colegas.
-                        </p>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
+            <!-- ÁREA DO PROFESSOR -->
+            <div class="card">
+
+                <div class="icone">👨‍🏫</div>
+
+                <h2>Sou professor</h2>
+
+                <p>
+                    Compartilhe conteúdos e disponibilize
+                    atividades para seus alunos.
+                </p>
+
+                <a href="cadastro-professor.html" class="botao">
+                    Criar conta
+                </a>
+
+                <a href="login-professor.html" class="link-login">
+                    Já tenho cadastro
+                </a>
+
+            </div>
+
+        </section>
+
+        <p class="rodape">
+            Conecta ADS — Plataforma Colaborativa de Aprendizagem
+        </p>
+
+    </main>
+
 </body>
 </html>
