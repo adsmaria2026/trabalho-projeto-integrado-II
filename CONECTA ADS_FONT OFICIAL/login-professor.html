@@ -5,32 +5,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Professor - Conecta ADS</title>
-    <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #343b50, #f58220);
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #203b63;
+            text-align: center;
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .subtitulo {
+            color: #777;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        label {
+            display: block;
+            color: #203b63;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #f58220;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #f58220;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #df7015;
+        }
+
+        #mensagem {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .cadastro {
+            text-align: center;
+            margin-top: 25px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .cadastro a {
+            color: #f58220;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
 </head>
+
 <body>
 
     <main class="container">
-        <h1>Área do Professor</h1>
-        <p>Entre para compartilhar conteúdos com seus alunos.</p>
+
+        <h1>Conecta <span style="color: #f58220;">ADS</span></h1>
+
+        <p class="subtitulo">
+            Área do Professor<br>
+            Entre para compartilhar conteúdos com seus alunos.
+        </p>
 
         <form id="formLoginProfessor">
+
             <label for="email">E-mail</label>
-            <input type="email" id="email" required>
+            <input
+                type="email"
+                id="email"
+                placeholder="Digite seu e-mail"
+                required
+            >
 
             <label for="senha">Senha</label>
-            <input type="password" id="senha" required>
+            <input
+                type="password"
+                id="senha"
+                placeholder="Digite sua senha"
+                required
+            >
 
             <button type="submit">Entrar</button>
+
         </form>
 
         <p id="mensagem"></p>
 
-        <p>
+        <p class="cadastro">
             Ainda não tem cadastro?
             <a href="cadastro-professor.html">Cadastre-se aqui</a>
         </p>
+
     </main>
 
     <script src="login-professor.js"></script>
+
 </body>
 </html>

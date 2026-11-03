@@ -9,69 +9,78 @@
     <style>
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
         }
 
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6fb;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            background: linear-gradient(135deg, #343b50, #f58220);
         }
 
         .container {
             background: white;
             width: 100%;
-            max-width: 450px;
-            padding: 35px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 400px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
         }
 
         h1 {
-            color: #263b70;
+            color: #203b63;
             text-align: center;
+            font-size: 30px;
             margin-bottom: 10px;
         }
 
         .subtitulo {
-            color: #666;
+            color: #777;
             text-align: center;
             margin-bottom: 25px;
+            line-height: 1.5;
         }
 
         label {
             display: block;
-            margin-bottom: 7px;
-            color: #333;
+            color: #203b63;
             font-weight: bold;
+            margin-bottom: 8px;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 18px;
+            padding: 13px;
             border: 1px solid #ccc;
-            border-radius: 7px;
-            font-size: 15px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #f58220;
         }
 
         button {
             width: 100%;
-            padding: 13px;
-            background: #263b70;
+            padding: 14px;
+            background: #f58220;
             color: white;
             border: none;
-            border-radius: 7px;
+            border-radius: 8px;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
         }
 
         button:hover {
-            background: #192b57;
+            background: #df7015;
         }
 
         #mensagem {
@@ -81,32 +90,71 @@
 
         .voltar {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .voltar a {
+            color: #f58220;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        @media (max-width: 450px) {
+            .container {
+                padding: 30px 25px;
+            }
         }
     </style>
 </head>
 
 <body>
+
     <main class="container">
-        <h1>Cadastro de Professor</h1>
+
+        <h1>Conecta <span style="color: #f58220;">ADS</span></h1>
 
         <p class="subtitulo">
+            Cadastro de Professor<br>
             Cadastre-se para compartilhar conteúdos com os alunos.
         </p>
 
         <form id="formCadastroProfessor">
 
             <label for="nome">Nome completo</label>
-            <input type="text" id="nome" required>
+            <input
+                type="text"
+                id="nome"
+                placeholder="Digite seu nome completo"
+                required
+            >
 
             <label for="email">E-mail</label>
-            <input type="email" id="email" required>
+            <input
+                type="email"
+                id="email"
+                placeholder="Digite seu e-mail"
+                required
+            >
 
             <label for="senha">Senha</label>
-            <input type="password" id="senha" required minlength="6">
+            <input
+                type="password"
+                id="senha"
+                placeholder="Crie uma senha"
+                required
+                minlength="6"
+            >
 
             <label for="confirmarSenha">Confirmar senha</label>
-            <input type="password" id="confirmarSenha" required minlength="6">
+            <input
+                type="password"
+                id="confirmarSenha"
+                placeholder="Repita sua senha"
+                required
+                minlength="6"
+            >
 
             <button type="submit">Cadastrar professor</button>
 
@@ -118,8 +166,10 @@
             Já possui cadastro?
             <a href="login-professor.html">Fazer login</a>
         </p>
+
     </main>
 
     <script src="cadastro-professor.js"></script>
+
 </body>
 </html>
