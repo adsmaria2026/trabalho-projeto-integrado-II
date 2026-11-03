@@ -1,6 +1,7 @@
 
 const formulario = document.getElementById("formConteudo");
 const mensagem = document.getElementById("mensagem");
+const botaoPublicar = formulario.querySelector('button[type="submit"]');
 
 // Verificar se existe um professor conectado
 const professorSalvo = localStorage.getItem("professorLogado");
@@ -15,11 +16,22 @@ const professor = JSON.parse(professorSalvo);
 formulario.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    // Impedir envios duplicados
+    if (botaoPublicar.disabled) {
+        return;
+    }
+
     const disciplina = document.getElementById("disciplina").value;
     const titulo = document.getElementById("titulo").value.trim();
     const resumo = document.getElementById("resumo").value.trim();
 
     try {
+        // Desativar botão durante o envio
+        botaoPublicar.disabled = true;
+        botaoPublicar.textContent = "Publicando...";
+
+        mensagem.textContent = "Enviando conteúdo...";
+
         const resposta = await fetch("/api/conteudos-professor", {
             method: "POST",
             headers: {
@@ -44,6 +56,11 @@ formulario.addEventListener("submit", async (event) => {
     } catch (erro) {
         console.error(erro);
         mensagem.textContent = "Erro ao conectar com o servidor.";
+
+    } finally {
+        // Reativar botão após finalizar
+        botaoPublicar.disabled = false;
+        botaoPublicar.textContent = "Publicar conteúdo";
     }
 });
 
