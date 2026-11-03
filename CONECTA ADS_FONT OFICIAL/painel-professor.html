@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Professor - Conecta ADS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <aside class="sidebar">
+            <h2>Conecta <span>ADS</span></h2>
+
+            <nav>
+                <a href="painel-professor.html" class="active">Painel</a>
+                <a href="estudos.html">Estudos</a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <a href="login-professor.html" id="sair">Sair</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header>
+                <div>
+                    <h1>Área do Professor</h1>
+                    <p>Compartilhe conhecimentos com os alunos.</p>
+                </div>
+                <div class="profile">👨‍🏫</div>
+            </header>
+
+            <section class="section">
+                <h2>Publicar conteúdo de estudo</h2>
+
+                <div class="work-container">
+
+                    <form id="formConteudo">
+
+                        <label for="disciplina">Disciplina</label>
+                        <select id="disciplina" required>
+                            <option value="">Selecione uma disciplina</option>
+                            <option value="Sistemas Operacionais">Sistemas Operacionais</option>
+                            <option value="Lógica e Matemática Computacional">Lógica e Matemática Computacional</option>
+                            <option value="Modelagem de Dados">Modelagem de Dados</option>
+                        </select>
+
+                        <label for="titulo">Título do conteúdo</label>
+                        <input type="text" id="titulo" required>
+
+                        <label for="resumo">Resumo</label>
+                        <textarea id="resumo" rows="8" required></textarea>
+
+                        <button type="submit">Publicar conteúdo</button>
+
+                    </form>
+
+                    <p id="mensagem"></p>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="painel-professor.js"></script>
+
+</body>
+</html>

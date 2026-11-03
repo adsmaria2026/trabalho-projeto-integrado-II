@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Professor - Conecta ADS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            color: #263b70;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitulo {
+            color: #666;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #263b70;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #192b57;
+        }
+
+        #mensagem {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .voltar {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <h1>Cadastro de Professor</h1>
+
+        <p class="subtitulo">
+            Cadastre-se para compartilhar conteúdos com os alunos.
+        </p>
+
+        <form id="formCadastroProfessor">
+
+            <label for="nome">Nome completo</label>
+            <input type="text" id="nome" required>
+
+            <label for="email">E-mail</label>
+            <input type="email" id="email" required>
+
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" required minlength="6">
+
+            <label for="confirmarSenha">Confirmar senha</label>
+            <input type="password" id="confirmarSenha" required minlength="6">
+
+            <button type="submit">Cadastrar professor</button>
+
+        </form>
+
+        <p id="mensagem"></p>
+
+        <p class="voltar">
+            Já possui cadastro?
+            <a href="login-professor.html">Fazer login</a>
+        </p>
+    </main>
+
+    <script src="cadastro-professor.js"></script>
+</body>
+</html>

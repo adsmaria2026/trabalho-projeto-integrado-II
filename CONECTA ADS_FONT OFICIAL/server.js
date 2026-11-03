@@ -37,6 +37,7 @@ app.get("/teste", (req, res) => {
     res.send("Servidor funcionando!");
 });
 
+
 // Teste da conexão com o MySQL
 app.get("/api/status", async (req, res) => {
     let conexao;
@@ -48,12 +49,256 @@ app.get("/api/status", async (req, res) => {
         res.json({
             mensagem: "Conecta ADS conectado ao MySQL!"
         });
+
     } catch (erro) {
         console.error(erro.code || erro.message);
 
         res.status(500).json({
             mensagem: "Erro ao conectar ao MySQL."
         });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+// Teste para identificar o banco e a tabela
+app.get("/api/teste-banco", async (req, res) => {
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [resultado] = await conexao.execute(`
+            SELECT
+                DATABASE() AS banco,
+                @@hostname AS servidor,
+                @@port AS porta
+        `);
+
+        const [tabelas] = await conexao.execute(
+            "SHOW TABLES LIKE 'conteudos_professor'"
+        );
+
+        res.json({
+            conexao: resultado[0],
+            tabelaEncontrada: tabelas.length > 0,
+            tabelas
+        });
+
+    } catch (erro) {
+        console.error("ERRO TESTE:", erro);
+
+        res.status(500).json({
+            erro: erro.message
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+// Cadastro de professor
+app.post("/api/cadastro-professor", async (req, res) => {
+    const { nome, email, senha } = req.body;
+
+    if (!nome || !email || !senha) {
+        return res.status(400).json({
+            mensagem: "Preencha todos os campos."
+        });
+    }
+
+    if (senha.length < 6) {
+        return res.status(400).json({
+            mensagem: "A senha deve ter pelo menos 6 caracteres."
+        });
+    }
+
+    let conexao;
+
+    try {
+        const senhaHash = await bcrypt.hash(senha, 10);
+        conexao = await conectarBanco();
+
+        await conexao.execute(
+            `INSERT INTO professores
+             (nome_completo, email, senha_hash)
+             VALUES (?, ?, ?)`,
+            [nome.trim(), email.trim().toLowerCase(), senhaHash]
+        );
+
+        res.status(201).json({
+            mensagem: "Professor cadastrado com sucesso!"
+        });
+
+    } catch (erro) {
+        console.error(erro.code || erro.message);
+
+        if (erro.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                mensagem: "Este e-mail já está cadastrado."
+            });
+        }
+
+        res.status(500).json({
+            mensagem: "Não foi possível cadastrar o professor."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+// Login do professor
+app.post("/api/login-professor", async (req, res) => {
+    const { email, senha } = req.body;
+
+    if (!email || !senha) {
+        return res.status(400).json({
+            mensagem: "Preencha o e-mail e a senha."
+        });
+    }
+
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [professores] = await conexao.execute(
+            `SELECT id_professor, nome_completo, email, senha_hash
+             FROM professores
+             WHERE email = ?`,
+            [email.trim().toLowerCase()]
+        );
+
+        if (professores.length === 0) {
+            return res.status(401).json({
+                mensagem: "E-mail ou senha incorretos."
+            });
+        }
+
+        const professor = professores[0];
+
+        const senhaCorreta = await bcrypt.compare(
+            senha,
+            professor.senha_hash
+        );
+
+        if (!senhaCorreta) {
+            return res.status(401).json({
+                mensagem: "E-mail ou senha incorretos."
+            });
+        }
+
+        res.json({
+            mensagem: "Login realizado com sucesso!",
+            professor: {
+                id: professor.id_professor,
+                nome: professor.nome_completo,
+                email: professor.email
+            }
+        });
+
+    } catch (erro) {
+        console.error(erro.code || erro.message);
+
+        res.status(500).json({
+            mensagem: "Erro ao realizar login."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+ // Publicar conteúdo de estudo pelo professor
+app.post("/api/conteudos-professor", async (req, res) => {
+    const { id_professor, disciplina, titulo, resumo } = req.body;
+
+    const idProfessor = Number(id_professor);
+
+    if (
+        !Number.isInteger(idProfessor) ||
+        idProfessor < 1 ||
+        !disciplina ||
+        !titulo ||
+        !resumo
+    ) {
+        return res.status(400).json({
+            mensagem: "Preencha todos os campos."
+        });
+    }
+
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [professores] = await conexao.execute(
+            "SELECT id_professor FROM professores WHERE id_professor = ?",
+            [idProfessor]
+        );
+
+        if (professores.length === 0) {
+            return res.status(404).json({
+                mensagem: "Professor não encontrado."
+            });
+        }
+
+        await conexao.execute(
+            `INSERT INTO conteudos_professor
+             (id_professor, disciplina, titulo, resumo)
+             VALUES (?, ?, ?, ?)`,
+            [idProfessor, disciplina, titulo.trim(), resumo.trim()]
+        );
+
+        res.status(201).json({
+            mensagem: "Conteúdo publicado com sucesso!"
+        });
+
+    } catch (erro) {
+        console.error(erro.code || erro.message);
+
+        res.status(500).json({
+            mensagem: "Erro ao publicar conteúdo."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+// Buscar conteúdos publicados pelos professores
+app.get("/api/conteudos-professor", async (req, res) => {
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [conteudos] = await conexao.execute(
+            `SELECT
+                c.id_conteudo,
+                c.disciplina,
+                c.titulo,
+                c.resumo,
+                c.data_publicacao,
+                p.nome_completo AS professor
+             FROM conteudos_professor c
+             INNER JOIN professores p
+                ON c.id_professor = p.id_professor
+             ORDER BY c.data_publicacao DESC`
+        );
+
+        res.json(conteudos);
+
+   } catch (erro) {
+    console.error("ERRO COMPLETO:", erro);
+
+    res.status(500).json({
+        mensagem: "Erro ao buscar conteúdos."
+    });
+
+
     } finally {
         if (conexao) await conexao.end();
     }
