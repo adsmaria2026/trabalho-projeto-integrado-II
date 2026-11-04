@@ -1,59 +1,418 @@
- <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trabalhos - Conecta ADS</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .form-trabalho {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .form-trabalho input,
+        .form-trabalho select,
+        .form-trabalho textarea {
+            width: 100%;
+            padding: 11px;
+            margin: 8px 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font: inherit;
+            box-sizing: border-box;
+        }
+
+        .form-trabalho textarea {
+            min-height: 85px;
+            resize: vertical;
+        }
+
+        .form-trabalho button,
+        .botao-comentar {
+            background: #2457a7;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .material {
+            margin-bottom: 20px;
+        }
+
+        .informacao-trabalho {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .comentarios {
+            margin-top: 18px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .comentario {
+            background: #f5f7fa;
+            padding: 10px;
+            border-radius: 7px;
+            margin: 10px 0;
+        }
+
+        .comentario small {
+            color: #777;
+        }
+
+        .campo-comentario {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            box-sizing: border-box;
+            font: inherit;
+        }
+
+        .mensagem {
+            margin: 12px 0;
+            font-weight: bold;
+        }
+
+        .link-trabalho {
+            display: inline-block;
+            margin-top: 8px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <aside class="sidebar">
-            <h2>Conecta <span>ADS</span></h2>
-            <nav>
-                <a href="inicio.html">🏠 Início</a>
-                <a href="estudos.html">📚 Estudos</a>
-                <a href="trabalhos.html" class="active">📄 Trabalhos</a>
-                <a href="quiz.html">📝 Quiz</a>
-                <a href="perfil.html">👤 Meu perfil</a>
-            </nav>
-            <div class="sidebar-bottom">
-                <a href="#">⚙️ Configurações</a>
-                <a href="login.html">🚪 Sair</a>
+<div class="container">
+
+    <aside class="sidebar">
+        <h2>Conecta <span>ADS</span></h2>
+        <nav>
+            <a href="inicio.html">🏠 Início</a>
+            <a href="estudos.html">📚 Estudos</a>
+            <a href="trabalhos.html" class="active">📄 Trabalhos</a>
+            <a href="quiz.html">📝 Quiz</a>
+            <a href="perfil.html">👤 Meu perfil</a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="#">⚙️ Configurações</a>
+            <a href="login.html">🚪 Sair</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header>
+            <div>
+                <h1>Trabalhos 📄</h1>
+                <p>Compartilhe trabalhos e aprenda com outros estudantes.</p>
             </div>
-        </aside>
-        <main class="main-content">
-            <header>
-                <div>
-                    <h1>Trabalhos 📄</h1>
-                    <p>Encontre trabalhos compartilhados pelos estudantes.</p>
-                </div>
-                <div class="profile">👤</div>
-            </header>
-            <section class="section">
-                <h2>Trabalhos disponíveis</h2>
-                <div class="materials">
-                    <div class="material">
-                        <h3>Trabalho de Sistemas Operacionais</h3>
-                        <p>Material compartilhado para referência e estudo.</p>
-                        <p><strong>Disciplina:</strong> Sistemas Operacionais</p>
-                        <a href="trabalho-sistemas-operacionais.html">Visualizar trabalho</a>
-                    </div>
-                    <div class="material">
-                        <h3>Trabalho de Lógica e Matemática</h3>
-                        <p>Material compartilhado para referência e estudo.</p>
-                        <p><strong>Disciplina:</strong> Lógica e Matemática Computacional</p>
-                        <a href="trabalho-logica-matematica.html">Visualizar trabalho</a>
-                    </div>
-                    <div class="material">
-                        <h3>Trabalho de Modelagem de Dados</h3>
-                        <p>Material compartilhado para referência e estudo.</p>
-                        <p><strong>Disciplina:</strong> Modelagem de Dados</p>
-                        <a href="trabalho-modelagem-dados.html">Visualizar trabalho</a>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
+            <div class="profile">👤</div>
+        </header>
+
+        <section class="section">
+            <h2>Compartilhar um trabalho</h2>
+
+            <form class="form-trabalho" id="formTrabalho">
+
+                <label for="titulo">Título do trabalho</label>
+                <input type="text" id="titulo" required
+                    placeholder="Digite o título do trabalho">
+
+                <label for="disciplina">Disciplina</label>
+                <select id="disciplina" required>
+                    <option value="">Selecione a disciplina</option>
+                    <option value="1">Sistemas Operacionais</option>
+                    <option value="2">Lógica e Matemática Computacional</option>
+                    <option value="3">Modelagem de Dados</option>
+                </select>
+
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao"
+                    placeholder="Descreva o conteúdo do trabalho"></textarea>
+
+                <label for="objetivo">Objetivo</label>
+                <textarea id="objetivo"
+                    placeholder="Qual é o objetivo deste trabalho?"></textarea>
+
+                <label for="arquivo">Link ou caminho do arquivo</label>
+                <input type="text" id="arquivo"
+                    placeholder="Cole um link ou informe o caminho do arquivo">
+
+                <button type="submit" id="botaoPublicar">
+                    Publicar trabalho
+                </button>
+
+                <p class="mensagem" id="mensagemFormulario"></p>
+            </form>
+        </section>
+
+        <section class="section">
+            <h2>Trabalhos disponíveis</h2>
+            <div class="materials" id="listaTrabalhos">
+                <p>Carregando trabalhos...</p>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+const API = "/api";
+
+function obterAluno() {
+    try {
+        return JSON.parse(localStorage.getItem("alunoLogado"));
+    } catch {
+        return null;
+    }
+}
+
+function formatarData(data) {
+    return new Date(data).toLocaleString("pt-BR");
+}
+
+// Publicar trabalho
+document.getElementById("formTrabalho").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const aluno = obterAluno();
+    const mensagem = document.getElementById("mensagemFormulario");
+    const botao = document.getElementById("botaoPublicar");
+
+    if (!aluno || !aluno.id) {
+        mensagem.textContent = "Faça login novamente para publicar um trabalho.";
+        return;
+    }
+
+    const dados = {
+        id_estudante: aluno.id,
+        id_disciplina: Number(document.getElementById("disciplina").value),
+        titulo: document.getElementById("titulo").value,
+        descricao: document.getElementById("descricao").value,
+        objetivo: document.getElementById("objetivo").value,
+        caminho_arquivo: document.getElementById("arquivo").value
+    };
+
+    try {
+        botao.disabled = true;
+        botao.textContent = "Publicando...";
+
+        const resposta = await fetch(`${API}/trabalhos`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok) {
+            throw new Error(resultado.mensagem || "Erro ao publicar.");
+        }
+
+        mensagem.textContent = resultado.mensagem;
+        this.reset();
+        await carregarTrabalhos();
+
+    } catch (erro) {
+        mensagem.textContent = erro.message;
+    } finally {
+        botao.disabled = false;
+        botao.textContent = "Publicar trabalho";
+    }
+});
+
+// Carregar trabalhos
+async function carregarTrabalhos() {
+    const lista = document.getElementById("listaTrabalhos");
+
+    try {
+        const resposta = await fetch(`${API}/trabalhos`);
+
+        if (!resposta.ok) {
+            throw new Error("Não foi possível carregar os trabalhos.");
+        }
+
+        const trabalhos = await resposta.json();
+
+        lista.innerHTML = "";
+
+        if (trabalhos.length === 0) {
+            lista.textContent = "Ainda não existem trabalhos publicados.";
+            return;
+        }
+
+        trabalhos.forEach(trabalho => {
+            const card = document.createElement("div");
+            card.className = "material";
+
+            const titulo = document.createElement("h3");
+            titulo.textContent = trabalho.titulo;
+
+            const descricao = document.createElement("p");
+            descricao.textContent = trabalho.descricao || "Sem descrição.";
+
+            const disciplina = document.createElement("p");
+            disciplina.innerHTML = "<strong>Disciplina:</strong> ";
+            disciplina.append(document.createTextNode(trabalho.disciplina));
+
+            const objetivo = document.createElement("p");
+            objetivo.innerHTML = "<strong>Objetivo:</strong> ";
+            objetivo.append(document.createTextNode(trabalho.objetivo || "Não informado."));
+
+            const autor = document.createElement("p");
+            autor.className = "informacao-trabalho";
+            autor.textContent = "Publicado por: " + trabalho.autor;
+
+            const data = document.createElement("p");
+            data.className = "informacao-trabalho";
+            data.textContent = "Data: " + formatarData(trabalho.data_publicacao);
+
+            card.append(titulo, descricao, disciplina, objetivo, autor, data);
+
+            if (trabalho.caminho_arquivo) {
+                const link = document.createElement("a");
+                link.className = "link-trabalho";
+                link.href = trabalho.caminho_arquivo;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.textContent = "Visualizar trabalho";
+                card.appendChild(link);
+            }
+
+            const areaComentarios = document.createElement("div");
+            areaComentarios.className = "comentarios";
+
+            const tituloComentarios = document.createElement("h4");
+            tituloComentarios.textContent = "Comentários";
+
+            const listaComentarios = document.createElement("div");
+            listaComentarios.textContent = "Carregando comentários...";
+
+            const campo = document.createElement("textarea");
+            campo.className = "campo-comentario";
+            campo.placeholder = "Escreva um comentário...";
+
+            const botao = document.createElement("button");
+            botao.className = "botao-comentar";
+            botao.textContent = "Comentar";
+
+            botao.addEventListener("click", async () => {
+                const aluno = obterAluno();
+
+                if (!aluno || !aluno.id) {
+                    alert("Faça login novamente para comentar.");
+                    return;
+                }
+
+                if (!campo.value.trim()) {
+                    alert("Digite um comentário.");
+                    return;
+                }
+
+                botao.disabled = true;
+
+                try {
+                    const resposta = await fetch(
+                        `${API}/trabalhos/${trabalho.id_trabalho}/comentarios`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id_estudante: aluno.id,
+                                comentario: campo.value
+                            })
+                        }
+                    );
+
+                    const resultado = await resposta.json();
+
+                    if (!resposta.ok) {
+                        throw new Error(resultado.mensagem || "Erro ao comentar.");
+                    }
+
+                    campo.value = "";
+                    await carregarComentarios(trabalho.id_trabalho, listaComentarios);
+
+                } catch (erro) {
+                    alert(erro.message);
+                } finally {
+                    botao.disabled = false;
+                }
+            });
+
+            areaComentarios.append(
+                tituloComentarios,
+                listaComentarios,
+                campo,
+                botao
+            );
+
+            card.appendChild(areaComentarios);
+            lista.appendChild(card);
+
+            carregarComentarios(trabalho.id_trabalho, listaComentarios);
+        });
+
+    } catch (erro) {
+        lista.textContent = erro.message;
+    }
+}
+
+// Buscar comentários
+async function carregarComentarios(idTrabalho, elemento) {
+    try {
+        const resposta = await fetch(
+            `${API}/trabalhos/${idTrabalho}/comentarios`
+        );
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao carregar comentários.");
+        }
+
+        const comentarios = await resposta.json();
+        elemento.innerHTML = "";
+
+        if (comentarios.length === 0) {
+            elemento.textContent = "Ainda não há comentários.";
+            return;
+        }
+
+        comentarios.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "comentario";
+
+            const texto = document.createElement("p");
+            texto.textContent = item.comentario;
+
+            const autor = document.createElement("strong");
+            autor.textContent = item.autor;
+
+            const data = document.createElement("small");
+            data.textContent = " • " + formatarData(item.data_comentario);
+
+            div.append(texto, autor, data);
+            elemento.appendChild(div);
+        });
+
+    } catch (erro) {
+        elemento.textContent = erro.message;
+    }
+}
+
+carregarTrabalhos();
+</script>
+
 </body>
 </html>

@@ -405,7 +405,89 @@ app.post("/api/login", async (req, res) => {
         if (conexao) await conexao.end();
     }
 });
+// Publicar material de estudo
+app.post("/api/materiais", async (req, res) => {
+    const {
+        id_estudante,
+        id_disciplina,
+        titulo,
+        descricao,
+        tipo,
+        caminho_arquivo
+    } = req.body;
 
+    const idEstudante = Number(id_estudante);
+    const idDisciplina = Number(id_disciplina);
+
+    const tiposPermitidos = ["resumo", "exercicio", "dica", "arquivo"];
+
+    if (
+        !Number.isInteger(idEstudante) || idEstudante < 1 ||
+        !Number.isInteger(idDisciplina) || idDisciplina < 1 ||
+        !titulo || !titulo.trim() ||
+        !tiposPermitidos.includes(tipo)
+    ) {
+        return res.status(400).json({
+            mensagem: "Preencha os campos obrigatórios corretamente."
+        });
+    }
+
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [alunos] = await conexao.execute(
+            "SELECT id_estudante FROM estudantes WHERE id_estudante = ?",
+            [idEstudante]
+        );
+
+        if (alunos.length === 0) {
+            return res.status(404).json({
+                mensagem: "Aluno não encontrado."
+            });
+        }
+
+        const [disciplinas] = await conexao.execute(
+            "SELECT id_disciplina FROM disciplinas WHERE id_disciplina = ?",
+            [idDisciplina]
+        );
+
+        if (disciplinas.length === 0) {
+            return res.status(404).json({
+                mensagem: "Disciplina não encontrada."
+            });
+        }
+
+        await conexao.execute(
+            `INSERT INTO materiais
+            (id_estudante, id_disciplina, titulo, descricao, tipo, caminho_arquivo)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+                idEstudante,
+                idDisciplina,
+                titulo.trim(),
+                descricao || null,
+                tipo,
+                caminho_arquivo || null
+            ]
+        );
+
+        res.status(201).json({
+            mensagem: "Material publicado com sucesso!"
+        });
+
+    } catch (erro) {
+        console.error("ERRO AO PUBLICAR MATERIAL:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao publicar material."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
 // Buscar materiais de uma disciplina
 app.get("/api/materiais/:id_disciplina", async (req, res) => {
     let conexao;
@@ -695,6 +777,245 @@ app.post("/api/conferir-resposta", async (req, res) => {
 });
 
 // Buscar dados do perfil no MySQL
+
+// ==========================================
+// TRABALHOS PUBLICADOS PELOS ESTUDANTES
+// ==========================================
+
+// Publicar um trabalho
+app.post("/api/trabalhos", async (req, res) => {
+    const {
+        id_estudante,
+        id_disciplina,
+        titulo,
+        descricao,
+        objetivo,
+        caminho_arquivo
+    } = req.body;
+
+    const idEstudante = Number(id_estudante);
+    const idDisciplina = Number(id_disciplina);
+
+    if (
+        !Number.isInteger(idEstudante) || idEstudante < 1 ||
+        !Number.isInteger(idDisciplina) || idDisciplina < 1 ||
+        !titulo || !titulo.trim()
+    ) {
+        return res.status(400).json({
+            mensagem: "Preencha o título, aluno e disciplina."
+        });
+    }
+
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [alunos] = await conexao.execute(
+            "SELECT id_estudante FROM estudantes WHERE id_estudante = ?",
+            [idEstudante]
+        );
+
+        if (alunos.length === 0) {
+            return res.status(404).json({
+                mensagem: "Aluno não encontrado."
+            });
+        }
+
+        const [disciplinas] = await conexao.execute(
+            "SELECT id_disciplina FROM disciplinas WHERE id_disciplina = ?",
+            [idDisciplina]
+        );
+
+        if (disciplinas.length === 0) {
+            return res.status(404).json({
+                mensagem: "Disciplina não encontrada."
+            });
+        }
+
+        await conexao.execute(
+            `INSERT INTO trabalhos
+            (id_estudante, id_disciplina, titulo, descricao, objetivo, caminho_arquivo)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+                idEstudante,
+                idDisciplina,
+                titulo.trim(),
+                descricao || null,
+                objetivo || null,
+                caminho_arquivo || null
+            ]
+        );
+
+        res.status(201).json({
+            mensagem: "Trabalho publicado com sucesso!"
+        });
+
+    } catch (erro) {
+        console.error("ERRO AO PUBLICAR TRABALHO:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao publicar trabalho."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+
+// Buscar todos os trabalhos publicados
+app.get("/api/trabalhos", async (req, res) => {
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [trabalhos] = await conexao.execute(
+            `SELECT
+                t.id_trabalho,
+                t.titulo,
+                t.descricao,
+                t.objetivo,
+                t.caminho_arquivo,
+                t.data_publicacao,
+                e.id_estudante,
+                e.nome_completo AS autor,
+                d.nome AS disciplina
+             FROM trabalhos t
+             INNER JOIN estudantes e
+                ON t.id_estudante = e.id_estudante
+             INNER JOIN disciplinas d
+                ON t.id_disciplina = d.id_disciplina
+             ORDER BY t.data_publicacao DESC`
+        );
+
+        res.json(trabalhos);
+
+    } catch (erro) {
+        console.error("ERRO AO BUSCAR TRABALHOS:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao buscar trabalhos."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+
+// Publicar comentário em um trabalho
+app.post("/api/trabalhos/:id_trabalho/comentarios", async (req, res) => {
+    const idTrabalho = Number(req.params.id_trabalho);
+    const idEstudante = Number(req.body.id_estudante);
+    const comentario = req.body.comentario;
+
+    if (
+        !Number.isInteger(idTrabalho) || idTrabalho < 1 ||
+        !Number.isInteger(idEstudante) || idEstudante < 1 ||
+        !comentario || !comentario.trim()
+    ) {
+        return res.status(400).json({
+            mensagem: "Informe o aluno e o comentário."
+        });
+    }
+
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [trabalhos] = await conexao.execute(
+            "SELECT id_trabalho FROM trabalhos WHERE id_trabalho = ?",
+            [idTrabalho]
+        );
+
+        if (trabalhos.length === 0) {
+            return res.status(404).json({
+                mensagem: "Trabalho não encontrado."
+            });
+        }
+
+        const [alunos] = await conexao.execute(
+            "SELECT id_estudante FROM estudantes WHERE id_estudante = ?",
+            [idEstudante]
+        );
+
+        if (alunos.length === 0) {
+            return res.status(404).json({
+                mensagem: "Aluno não encontrado."
+            });
+        }
+
+        await conexao.execute(
+            `INSERT INTO comentarios_trabalhos
+            (id_trabalho, id_estudante, comentario)
+            VALUES (?, ?, ?)`,
+            [idTrabalho, idEstudante, comentario.trim()]
+        );
+
+        res.status(201).json({
+            mensagem: "Comentário publicado com sucesso!"
+        });
+
+    } catch (erro) {
+        console.error("ERRO AO PUBLICAR COMENTÁRIO:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao publicar comentário."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+
+// Buscar comentários de um trabalho
+app.get("/api/trabalhos/:id_trabalho/comentarios", async (req, res) => {
+    const idTrabalho = Number(req.params.id_trabalho);
+
+    if (!Number.isInteger(idTrabalho) || idTrabalho < 1) {
+        return res.status(400).json({
+            mensagem: "Trabalho inválido."
+        });
+    }
+
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [comentarios] = await conexao.execute(
+            `SELECT
+                c.id_comentario,
+                c.comentario,
+                c.data_comentario,
+                e.id_estudante,
+                e.nome_completo AS autor
+             FROM comentarios_trabalhos c
+             INNER JOIN estudantes e
+                ON c.id_estudante = e.id_estudante
+             WHERE c.id_trabalho = ?
+             ORDER BY c.data_comentario ASC`,
+            [idTrabalho]
+        );
+
+        res.json(comentarios);
+
+    } catch (erro) {
+        console.error("ERRO AO BUSCAR COMENTÁRIOS:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao buscar comentários."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
 app.get("/api/perfil/:ra", async (req, res) => {
     let conexao;
 

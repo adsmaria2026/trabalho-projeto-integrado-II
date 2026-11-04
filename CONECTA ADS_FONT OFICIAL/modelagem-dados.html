@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,18 +11,21 @@
     <div class="container">
         <aside class="sidebar">
             <h2>Conecta <span>ADS</span></h2>
+
             <nav>
-                <a href="index.html">🏠 Início</a>
+                <a href="inicio.html">🏠 Início</a>
                 <a href="estudos.html" class="active">📚 Estudos</a>
-                <a href="#">📄 Trabalhos</a>
-                <a href="#">📝 Dicas para provas</a>
-                <a href="#">👤 Meu perfil</a>
+                <a href="trabalhos.html">📄 Trabalhos</a>
+                <a href="quiz.html">📝 Quiz</a>
+                <a href="perfil.html">👤 Meu perfil</a>
             </nav>
+
             <div class="sidebar-bottom">
                 <a href="#">⚙️ Configurações</a>
                 <a href="login.html">🚪 Sair</a>
             </div>
         </aside>
+
         <main class="main-content">
             <header>
                 <div>
@@ -30,32 +34,208 @@
                 </div>
                 <div class="profile">👤</div>
             </header>
+
             <section class="section">
-                <h2>Resumos</h2>
-                <div class="materials">
-                    <div class="material">
-                        <h3>Introdução à Modelagem de Dados</h3>
-                        <p>Conceitos básicos de entidades, atributos e relacionamentos.</p>
-                   <a href="resumo-modelagem-dados.html">Visualizar resumo</a>
-                    </div>
-                    <div class="material">
-    <h3>Modelo Entidade-Relacionamento</h3>
-    <p>Entidades, atributos, relacionamentos e representação de diagramas.</p>
-    <a href="resumo-modelagem-dados.html">Visualizar resumo</a>
-</div>
-                </div>
+                <h2>Compartilhar material</h2>
+
+                <form id="formMaterial" class="material">
+                    <label for="titulo">Título do material</label>
+                    <input type="text" id="titulo" required maxlength="180"
+                        placeholder="Ex.: Introdução à Modelagem de Dados">
+
+                    <label for="tipo">Tipo de material</label>
+                    <select id="tipo" required>
+                        <option value="resumo">Resumo</option>
+                        <option value="exercicio">Exercício</option>
+                        <option value="dica">Anotação</option>
+                    </select>
+
+                    <label for="descricao">Descrição</label>
+                    <textarea id="descricao" rows="3"
+                        placeholder="Descreva brevemente o conteúdo..."></textarea>
+
+                    <label for="link">Link do material</label>
+                    <input type="url" id="link"
+                        placeholder="https://..." required>
+
+                    <button type="submit" id="btnPublicar">
+                        Compartilhar material
+                    </button>
+
+                    <p id="mensagemMaterial"></p>
+                </form>
             </section>
+
             <section class="section">
-                <h2>Exercícios</h2>
-                <div class="materials">
-                    <div class="material">
-                        <h3>Exercícios de Modelagem de Dados</h3>
-                        <p>Questões para praticar entidades, atributos e relacionamentos.</p>
-                        <a href="exercicios-modelagem-dados.html">Visualizar exercícios</a>
-                    </div>
+                <h2>Materiais compartilhados</h2>
+
+                <div class="materials" id="lista-materiais">
+                    <p>Carregando materiais...</p>
                 </div>
             </section>
         </main>
     </div>
+
+    <script>
+        const API = "/api";
+        const ID_DISCIPLINA = 3;
+
+        function obterAluno() {
+            try {
+                return JSON.parse(localStorage.getItem("alunoLogado"));
+            } catch {
+                return null;
+            }
+        }
+
+        async function carregarMateriais() {
+            const lista = document.getElementById("lista-materiais");
+
+            try {
+                const resposta = await fetch(
+                    `${API}/materiais/${ID_DISCIPLINA}`
+                );
+
+                if (!resposta.ok) {
+                    throw new Error("Erro ao buscar materiais.");
+                }
+
+                const materiais = await resposta.json();
+
+                lista.innerHTML = "";
+
+                if (materiais.length === 0) {
+                    lista.innerHTML =
+                        "<p>Nenhum material compartilhado ainda.</p>";
+                    return;
+                }
+
+                materiais.forEach(material => {
+                    const card = document.createElement("div");
+                    card.className = "material";
+
+                    const titulo = document.createElement("h3");
+                    titulo.textContent = material.titulo;
+
+                    const tipo = document.createElement("p");
+                    tipo.textContent = "Tipo: " + material.tipo;
+
+                    const descricao = document.createElement("p");
+                    descricao.textContent =
+                        material.descricao || "Sem descrição.";
+
+                    const autor = document.createElement("p");
+                    autor.textContent =
+                        "Compartilhado por: " + material.autor;
+
+                    const data = document.createElement("p");
+                    data.textContent =
+                        "Data: " +
+                        new Date(material.data_publicacao)
+                            .toLocaleString("pt-BR");
+
+                    card.appendChild(titulo);
+                    card.appendChild(tipo);
+                    card.appendChild(descricao);
+                    card.appendChild(autor);
+                    card.appendChild(data);
+
+                    if (material.caminho_arquivo) {
+                        try {
+                            const url = new URL(material.caminho_arquivo);
+
+                            if (url.protocol === "https:" ||
+                                url.protocol === "http:") {
+                                const link = document.createElement("a");
+                                link.href = url.href;
+                                link.target = "_blank";
+                                link.rel = "noopener noreferrer";
+                                link.textContent = "Abrir material";
+
+                                card.appendChild(link);
+                            } else {
+                                const aviso = document.createElement("p");
+                                aviso.textContent = "Link inválido.";
+                                card.appendChild(aviso);
+                            }
+                        } catch {
+                            const aviso = document.createElement("p");
+                            aviso.textContent = "Link inválido.";
+                            card.appendChild(aviso);
+                        }
+                    }
+
+                    lista.appendChild(card);
+                });
+
+            } catch (erro) {
+                console.error("Erro ao carregar materiais:", erro);
+                lista.innerHTML =
+                    "<p>Não foi possível carregar os materiais.</p>";
+            }
+        }
+
+        document.getElementById("formMaterial")
+            .addEventListener("submit", async function(event) {
+
+                event.preventDefault();
+
+                const aluno = obterAluno();
+                const mensagem =
+                    document.getElementById("mensagemMaterial");
+                const botao =
+                    document.getElementById("btnPublicar");
+
+                if (!aluno || !aluno.id) {
+                    mensagem.textContent =
+                        "Faça login novamente para compartilhar.";
+                    return;
+                }
+
+                const dados = {
+                    id_estudante: aluno.id,
+                    id_disciplina: ID_DISCIPLINA,
+                    titulo: document.getElementById("titulo").value,
+                    tipo: document.getElementById("tipo").value,
+                    descricao: document.getElementById("descricao").value,
+                    caminho_arquivo: document.getElementById("link").value
+                };
+
+                try {
+                    botao.disabled = true;
+                    botao.textContent = "Publicando...";
+                    mensagem.textContent = "";
+
+                    const resposta = await fetch(`${API}/materiais`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(dados)
+                    });
+
+                    const resultado = await resposta.json();
+
+                    if (!resposta.ok) {
+                        throw new Error(resultado.mensagem);
+                    }
+
+                    mensagem.textContent = resultado.mensagem;
+
+                    this.reset();
+
+                    await carregarMateriais();
+
+                } catch (erro) {
+                    mensagem.textContent =
+                        erro.message || "Erro ao publicar material.";
+                } finally {
+                    botao.disabled = false;
+                    botao.textContent = "Compartilhar material";
+                }
+            });
+
+        carregarMateriais();
+    </script>
 </body>
 </html>
