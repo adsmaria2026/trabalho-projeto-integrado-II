@@ -29,27 +29,85 @@
                 </div>
                 <div class="profile">👤</div>
             </header>
-            <section class="section">
-                <h2>Escolha uma disciplina</h2>
-                <div class="materials">
-                    <div class="material">
-                        <h3>Sistemas Operacionais</h3>
-                        <p>Teste seus conhecimentos sobre sistemas operacionais.</p>
-                        <a href="quiz-sistemas-operacionais.html">Iniciar quiz</a>
-                    </div>
-                    <div class="material">
-                        <h3>Lógica e Matemática Computacional</h3>
-                        <p>Teste seus conhecimentos sobre lógica e conjuntos.</p>
-                       <a href="quiz-logica-matematica.html">Iniciar quiz</a>
-                    </div>
-                    <div class="material">
-                        <h3>Modelagem de Dados</h3>
-                        <p>Teste seus conhecimentos sobre modelagem de dados.</p>
-                        <a href="quiz-modelagem-dados.html">Iniciar quiz</a>
-                    </div>
-                </div>
-            </section>
+           <section class="section">
+    <h2>Escolha uma disciplina</h2>
+
+    <div class="materials">
+        <div class="material">
+            <h3>Sistemas Operacionais</h3>
+            <p>Quizzes publicados pelos professores.</p>
+            <div id="quizzes-1"></div>
+        </div>
+
+        <div class="material">
+            <h3>Lógica e Matemática Computacional</h3>
+            <p>Quizzes publicados pelos professores.</p>
+            <div id="quizzes-2"></div>
+        </div>
+
+        <div class="material">
+            <h3>Modelagem de Dados</h3>
+            <p>Quizzes publicados pelos professores.</p>
+            <div id="quizzes-3"></div>
+        </div>
+    </div>
+</section>
         </main>
     </div>
+            </main>
+    </div>
+
+    <!-- SCRIPT PARA CARREGAR OS QUIZZES -->
+    <script>
+    async function carregarQuizzes(idDisciplina) {
+        const lista = document.getElementById(`quizzes-${idDisciplina}`);
+
+        lista.innerHTML = "Carregando quizzes...";
+
+        try {
+            const resposta = await fetch(`/api/quizzes/${idDisciplina}`);
+
+            if (!resposta.ok) {
+                throw new Error("Erro ao buscar quizzes");
+            }
+
+            const quizzes = await resposta.json();
+
+            lista.innerHTML = "";
+
+            if (quizzes.length === 0) {
+                lista.textContent = "Nenhum quiz disponível nesta disciplina.";
+                return;
+            }
+
+            quizzes.forEach(quiz => {
+                const item = document.createElement("div");
+
+                const titulo = document.createElement("h4");
+                titulo.textContent = quiz.titulo;
+
+                const link = document.createElement("a");
+                link.textContent = "Iniciar quiz";
+                link.href = `responder-quiz.html?id_quiz=${quiz.id_quiz}`;
+
+                item.appendChild(titulo);
+                item.appendChild(link);
+
+                lista.appendChild(item);
+            });
+
+        } catch (erro) {
+            console.error(erro);
+            lista.textContent = "Não foi possível carregar os quizzes.";
+        }
+    }
+
+    carregarQuizzes(1);
+    carregarQuizzes(2);
+    carregarQuizzes(3);
+    </script>
+
+</body>
+</html>
 </body>
 </html>

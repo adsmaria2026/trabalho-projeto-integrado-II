@@ -391,3 +391,21 @@ button {
 .back-link:hover {
     color: #f58220;
 }
+/* Painel de desempenho do estudante */
+.desempenho-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.desempenho-grid .material {
+    margin: 0;
+    min-width: 0;
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 768px) {
+    .desempenho-grid {
+        grid-template-columns: 1fr;
+    }
+}

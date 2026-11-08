@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responder Quiz - Conecta ADS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Conecta <span>ADS</span></h2>
+            <nav>
+                <a href="inicio.html">🏠 Início</a>
+                <a href="estudos.html">📚 Estudos</a>
+                <a href="trabalhos.html">📄 Trabalhos</a>
+                <a href="quiz.html" class="active">📝 Quiz</a>
+            </nav>
+            <div class="sidebar-bottom">
+                <a href="login.html">🚪 Sair</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div>
+                    <h1 id="tituloQuiz">Quiz 📝</h1>
+                    <p>Responda às perguntas e teste seus conhecimentos.</p>
+                </div>
+                <div class="profile">👤</div>
+            </header>
+
+            <section class="section">
+                <div id="areaPerguntas"></div>
+                <p id="mensagemQuiz"></p>
+                <div id="resultadoQuiz"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="responder-quiz.js"></script>
+</body>
+</html>

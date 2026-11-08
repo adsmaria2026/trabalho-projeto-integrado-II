@@ -68,3 +68,123 @@ formulario.addEventListener("submit", async (event) => {
 document.getElementById("sair").addEventListener("click", () => {
     localStorage.removeItem("professorLogado");
 });
+// ==========================================
+// CRIAR QUIZ PELO PROFESSOR
+// ==========================================
+
+const formQuiz = document.getElementById("formQuiz");
+const listaPerguntas = document.getElementById("listaPerguntas");
+const botaoAdicionar = document.getElementById("adicionarPergunta");
+const mensagemQuiz = document.getElementById("mensagemQuiz");
+
+let contadorPerguntas = 0;
+
+// Adicionar uma nova pergunta
+botaoAdicionar.addEventListener("click", () => {
+    contadorPerguntas++;
+
+    const pergunta = document.createElement("div");
+
+    pergunta.className = "pergunta-quiz";
+
+    pergunta.innerHTML = `
+        <hr>
+        <h3>Pergunta ${contadorPerguntas}</h3>
+
+        <label>Enunciado da pergunta</label>
+        <textarea class="enunciado" rows="3" required></textarea>
+
+        <label>Alternativa A</label>
+        <input type="text" class="alternativa-a" required>
+
+        <label>Alternativa B</label>
+        <input type="text" class="alternativa-b" required>
+
+        <label>Alternativa C</label>
+        <input type="text" class="alternativa-c" required>
+
+        <label>Alternativa D</label>
+        <input type="text" class="alternativa-d" required>
+
+        <label>Resposta correta</label>
+        <select class="resposta-correta" required>
+            <option value="">Selecione a resposta correta</option>
+            <option value="A">Alternativa A</option>
+            <option value="B">Alternativa B</option>
+            <option value="C">Alternativa C</option>
+            <option value="D">Alternativa D</option>
+        </select>
+
+        <label>Explicação da resposta</label>
+        <textarea class="explicacao" rows="2"></textarea>
+    `;
+
+    listaPerguntas.appendChild(pergunta);
+});
+// Publicar quiz no banco de dados
+formQuiz.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const disciplina = document.getElementById("disciplinaQuiz").value;
+    const titulo = document.getElementById("tituloQuiz").value.trim();
+
+    const blocosPerguntas = document.querySelectorAll(".pergunta-quiz");
+
+    if (blocosPerguntas.length === 0) {
+        mensagemQuiz.textContent = "Adicione pelo menos uma pergunta.";
+        return;
+    }
+
+    const perguntas = [];
+
+    blocosPerguntas.forEach((bloco) => {
+        perguntas.push({
+            enunciado: bloco.querySelector(".enunciado").value,
+            alternativa_a: bloco.querySelector(".alternativa-a").value,
+            alternativa_b: bloco.querySelector(".alternativa-b").value,
+            alternativa_c: bloco.querySelector(".alternativa-c").value,
+            alternativa_d: bloco.querySelector(".alternativa-d").value,
+            resposta_correta: bloco.querySelector(".resposta-correta").value,
+            explicacao: bloco.querySelector(".explicacao").value
+        });
+    });
+
+    const botaoPublicarQuiz = document.getElementById("publicarQuiz");
+
+    try {
+        botaoPublicarQuiz.disabled = true;
+        botaoPublicarQuiz.textContent = "Publicando...";
+        mensagemQuiz.textContent = "Enviando quiz...";
+
+        const resposta = await fetch("/api/quiz", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+          body: JSON.stringify({
+    id_disciplina: disciplina,
+    id_professor: professor.id,
+    titulo,
+    perguntas
+})
+        });
+
+        const dados = await resposta.json();
+
+        mensagemQuiz.textContent = dados.mensagem;
+
+        if (resposta.ok) {
+            formQuiz.reset();
+            listaPerguntas.innerHTML = "";
+            contadorPerguntas = 0;
+        }
+
+    } catch (erro) {
+        console.error("Erro ao publicar quiz:", erro);
+        mensagemQuiz.textContent = "Erro ao conectar com o servidor.";
+
+    } finally {
+        botaoPublicarQuiz.disabled = false;
+        botaoPublicarQuiz.textContent = "Publicar quiz";
+    }
+});

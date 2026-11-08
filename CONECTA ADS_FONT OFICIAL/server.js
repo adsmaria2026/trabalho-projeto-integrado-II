@@ -534,7 +534,224 @@ app.get("/api/materiais/:id_disciplina", async (req, res) => {
         if (conexao) await conexao.end();
     }
 });
+// ==========================================
+// PUBLICAR QUIZ PELO PROFESSOR
+// ==========================================
 
+app.post("/api/quiz", async (req, res) => {
+    const { id_disciplina, id_professor, titulo, perguntas } = req.body;
+
+    const idDisciplina = Number(id_disciplina);
+    const idProfessor = Number(id_professor);
+
+    if (
+        !Number.isInteger(idDisciplina) || idDisciplina < 1 ||
+        !Number.isInteger(idProfessor) || idProfessor < 1 ||
+        !titulo?.trim() ||
+        !Array.isArray(perguntas) ||
+        perguntas.length === 0
+    ) {
+        return res.status(400).json({
+            mensagem: "Preencha os dados do quiz e adicione perguntas."
+        });
+    }
+
+    for (const pergunta of perguntas) {
+        if (
+            !pergunta.enunciado?.trim() ||
+            !pergunta.alternativa_a?.trim() ||
+            !pergunta.alternativa_b?.trim() ||
+            !pergunta.alternativa_c?.trim() ||
+            !pergunta.alternativa_d?.trim() ||
+            !["A", "B", "C", "D"].includes(pergunta.resposta_correta)
+        ) {
+            return res.status(400).json({
+                mensagem: "Preencha todas as perguntas e alternativas corretamente."
+            });
+        }
+    }
+
+    let conexao;
+    let transacaoIniciada = false;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [professores] = await conexao.execute(
+            "SELECT id_professor FROM professores WHERE id_professor = ?",
+            [idProfessor]
+        );
+
+        const [disciplinas] = await conexao.execute(
+            "SELECT id_disciplina FROM disciplinas WHERE id_disciplina = ?",
+            [idDisciplina]
+        );
+
+        if (professores.length === 0 || disciplinas.length === 0) {
+            return res.status(404).json({
+                mensagem: "Professor ou disciplina não encontrado."
+            });
+        }
+
+        await conexao.beginTransaction();
+        transacaoIniciada = true;
+
+        const [resultadoQuiz] = await conexao.execute(
+            `INSERT INTO quizzes
+            (id_disciplina, id_professor, titulo)
+            VALUES (?, ?, ?)`,
+            [idDisciplina, idProfessor, titulo.trim()]
+        );
+
+        const idQuiz = resultadoQuiz.insertId;
+
+        for (const pergunta of perguntas) {
+            await conexao.execute(
+                `INSERT INTO perguntas_quiz
+                (
+                    id_quiz,
+                    id_disciplina,
+                    enunciado,
+                    alternativa_a,
+                    alternativa_b,
+                    alternativa_c,
+                    alternativa_d,
+                    resposta_correta,
+                    explicacao
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    idQuiz,
+                    idDisciplina,
+                    pergunta.enunciado.trim(),
+                    pergunta.alternativa_a.trim(),
+                    pergunta.alternativa_b.trim(),
+                    pergunta.alternativa_c.trim(),
+                    pergunta.alternativa_d.trim(),
+                    pergunta.resposta_correta,
+                    pergunta.explicacao?.trim() || null
+                ]
+            );
+        }
+
+        await conexao.commit();
+        transacaoIniciada = false;
+
+        res.status(201).json({
+            mensagem: "Quiz publicado com sucesso!",
+            id_quiz: idQuiz,
+            total_perguntas: perguntas.length
+        });
+
+    } catch (erro) {
+        if (conexao && transacaoIniciada) {
+            await conexao.rollback();
+        }
+
+        console.error("ERRO AO PUBLICAR QUIZ:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao publicar quiz."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+// ==========================================
+// LISTAR QUIZZES POR DISCIPLINA
+// ==========================================
+
+app.get("/api/quizzes/:id_disciplina", async (req, res) => {
+    let conexao;
+
+    try {
+        const idDisciplina = Number(req.params.id_disciplina);
+
+        conexao = await conectarBanco();
+
+        const [quizzes] = await conexao.execute(
+            `SELECT id_quiz, id_disciplina, titulo, data_publicacao
+             FROM quizzes
+             WHERE id_disciplina = ?
+             ORDER BY data_publicacao DESC`,
+            [idDisciplina]
+        );
+
+        res.json(quizzes);
+
+    } catch (erro) {
+        console.error("ERRO AO BUSCAR QUIZZES:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao buscar quizzes."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+// ==========================================
+// BUSCAR UM QUIZ ESPECÍFICO
+// ==========================================
+
+app.get("/api/quiz/:id_quiz", async (req, res) => {
+    let conexao;
+
+    try {
+        const idQuiz = Number(req.params.id_quiz);
+
+        if (!Number.isInteger(idQuiz) || idQuiz < 1) {
+            return res.status(400).json({
+                mensagem: "ID do quiz inválido."
+            });
+        }
+
+        conexao = await conectarBanco();
+
+        const [quizzes] = await conexao.execute(
+            `SELECT id_quiz, id_disciplina, titulo
+             FROM quizzes
+             WHERE id_quiz = ?`,
+            [idQuiz]
+        );
+
+        if (quizzes.length === 0) {
+            return res.status(404).json({
+                mensagem: "Quiz não encontrado."
+            });
+        }
+
+        const [perguntas] = await conexao.execute(
+            `SELECT
+                id_pergunta,
+                enunciado,
+                alternativa_a,
+                alternativa_b,
+                alternativa_c,
+                alternativa_d
+             FROM perguntas_quiz
+             WHERE id_quiz = ?
+             ORDER BY id_pergunta`,
+            [idQuiz]
+        );
+
+        res.json({
+            quiz: quizzes[0],
+            perguntas
+        });
+
+    } catch (erro) {
+        console.error("ERRO AO BUSCAR QUIZ:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao buscar o quiz."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
 // Buscar perguntas do quiz por disciplina
 app.get("/api/perguntas-quiz/:id_disciplina", async (req, res) => {
     let conexao;
@@ -580,16 +797,24 @@ app.get("/api/perguntas-quiz/:id_disciplina", async (req, res) => {
 
 // Salvar uma tentativa e as respostas do quiz
 app.post("/api/tentativas-quiz", async (req, res) => {
-    const { id_estudante, id_disciplina, respostas } = req.body;
+    const {
+        id_estudante,
+        id_disciplina,
+        id_quiz,
+        respostas
+    } = req.body;
 
     const idEstudante = Number(id_estudante);
     const idDisciplina = Number(id_disciplina);
+    const idQuiz = id_quiz ? Number(id_quiz) : null;
 
     if (
         !Number.isInteger(idEstudante) ||
         idEstudante < 1 ||
         !Number.isInteger(idDisciplina) ||
         idDisciplina < 1 ||
+        (idQuiz !== null &&
+            (!Number.isInteger(idQuiz) || idQuiz < 1)) ||
         !Array.isArray(respostas) ||
         respostas.length === 0
     ) {
@@ -604,7 +829,9 @@ app.post("/api/tentativas-quiz", async (req, res) => {
         if (
             !Number.isInteger(Number(resposta.id_pergunta)) ||
             Number(resposta.id_pergunta) < 1 ||
-            !["A", "B", "C", "D"].includes(resposta.alternativa_escolhida)
+            !["A", "B", "C", "D"].includes(
+                resposta.alternativa_escolhida
+            )
         ) {
             return res.status(400).json({
                 mensagem: "Existe uma resposta inválida."
@@ -626,7 +853,6 @@ app.post("/api/tentativas-quiz", async (req, res) => {
     try {
         conexao = await conectarBanco();
 
-        // Confirmar que o aluno existe.
         const [alunos] = await conexao.execute(
             "SELECT id_estudante FROM estudantes WHERE id_estudante = ?",
             [idEstudante]
@@ -638,13 +864,52 @@ app.post("/api/tentativas-quiz", async (req, res) => {
             });
         }
 
-        // Buscar as respostas corretas diretamente no banco.
-        const [perguntas] = await conexao.execute(
-            `SELECT id_pergunta, resposta_correta
-             FROM perguntas_quiz
-             WHERE id_disciplina = ?`,
-            [idDisciplina]
-        );
+        let perguntas;
+
+        if (idQuiz !== null) {
+            const [quizzes] = await conexao.execute(
+                `SELECT id_quiz
+                 FROM quizzes
+                 WHERE id_quiz = ? AND id_disciplina = ?`,
+                [idQuiz, idDisciplina]
+            );
+
+            if (quizzes.length === 0) {
+                return res.status(404).json({
+                    mensagem: "Quiz não encontrado nesta disciplina."
+                });
+            }
+
+            const [resultadoPerguntas] = await conexao.execute(
+                `SELECT id_pergunta, resposta_correta
+                 FROM perguntas_quiz
+                 WHERE id_quiz = ? AND id_disciplina = ?`,
+                [idQuiz, idDisciplina]
+            );
+
+            perguntas = resultadoPerguntas;
+        } else {
+            const [resultadoPerguntas] = await conexao.execute(
+                `SELECT id_pergunta, resposta_correta
+                 FROM perguntas_quiz
+                 WHERE id_disciplina = ? AND id_quiz IS NULL`,
+                [idDisciplina]
+            );
+
+            perguntas = resultadoPerguntas;
+        }
+
+        if (perguntas.length === 0) {
+            return res.status(400).json({
+                mensagem: "Este quiz não possui perguntas."
+            });
+        }
+
+        if (respostas.length !== perguntas.length) {
+            return res.status(400).json({
+                mensagem: "Responda todas as perguntas antes de finalizar."
+            });
+        }
 
         const mapaPerguntas = new Map(
             perguntas.map(pergunta => [
@@ -653,11 +918,10 @@ app.post("/api/tentativas-quiz", async (req, res) => {
             ])
         );
 
-        // Garantir que todas as questões enviadas pertencem ao quiz.
         for (const resposta of respostas) {
             if (!mapaPerguntas.has(Number(resposta.id_pergunta))) {
                 return res.status(400).json({
-                    mensagem: "Uma questão não pertence a esta disciplina."
+                    mensagem: "Uma questão não pertence a este quiz."
                 });
             }
         }
@@ -667,22 +931,25 @@ app.post("/api/tentativas-quiz", async (req, res) => {
 
         let pontuacao = 0;
 
-        const [resultadoTentativa] = await conexao.execute(
-            `INSERT INTO tentativas_quiz
-             (id_estudante, id_disciplina, pontuacao, total_perguntas)
-             VALUES (?, ?, 0, ?)`,
-            [idEstudante, idDisciplina, respostas.length]
-        );
+       const [resultadoTentativa] = await conexao.execute(
+    `INSERT INTO tentativas_quiz
+     (id_estudante, id_disciplina, id_quiz, pontuacao, total_perguntas)
+     VALUES (?, ?, ?, 0, ?)`,
+    [idEstudante, idDisciplina, idQuiz, perguntas.length]
+);
 
         const idTentativa = resultadoTentativa.insertId;
 
         for (const resposta of respostas) {
             const idPergunta = Number(resposta.id_pergunta);
             const alternativa = resposta.alternativa_escolhida;
+
             const correta =
                 alternativa === mapaPerguntas.get(idPergunta);
 
-            if (correta) pontuacao++;
+            if (correta) {
+                pontuacao++;
+            }
 
             await conexao.execute(
                 `INSERT INTO respostas_quiz
@@ -706,8 +973,9 @@ app.post("/api/tentativas-quiz", async (req, res) => {
             mensagem: "Tentativa salva com sucesso!",
             id_tentativa: idTentativa,
             pontuacao,
-            total_perguntas: respostas.length
+            total_perguntas: perguntas.length
         });
+
     } catch (erro) {
         if (conexao && transacaoIniciada) {
             await conexao.rollback();
@@ -718,6 +986,7 @@ app.post("/api/tentativas-quiz", async (req, res) => {
         res.status(500).json({
             mensagem: "Não foi possível salvar a tentativa."
         });
+
     } finally {
         if (conexao) await conexao.end();
     }
@@ -1049,7 +1318,51 @@ app.get("/api/perfil/:ra", async (req, res) => {
 
 // Iniciar o servidor por último
 const PORT = process.env.PORT || 3000;
+// Buscar histórico de quizzes do estudante
+app.get("/api/historico-quiz/:id_estudante", async (req, res) => {
+    let conexao;
 
+    try {
+        const idEstudante = Number(req.params.id_estudante);
+
+        if (!Number.isInteger(idEstudante) || idEstudante < 1) {
+            return res.status(400).json({
+                mensagem: "ID do estudante inválido."
+            });
+        }
+
+        conexao = await conectarBanco();
+
+        const [historico] = await conexao.execute(
+            `SELECT
+                t.id_tentativa,
+                t.id_quiz,
+                q.titulo AS titulo_quiz,
+                d.nome AS disciplina,
+                t.pontuacao,
+                t.total_perguntas,
+                t.data_tentativa
+             FROM tentativas_quiz t
+             LEFT JOIN quizzes q ON t.id_quiz = q.id_quiz
+             INNER JOIN disciplinas d ON t.id_disciplina = d.id_disciplina
+             WHERE t.id_estudante = ?
+             ORDER BY t.data_tentativa DESC`,
+            [idEstudante]
+        );
+
+        res.json(historico);
+
+    } catch (erro) {
+        console.error(erro.code || erro.message);
+
+        res.status(500).json({
+            mensagem: "Não foi possível carregar o histórico."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
 app.listen(PORT, () => {
     console.log(`Servidor iniciado na porta ${PORT}`);
 });

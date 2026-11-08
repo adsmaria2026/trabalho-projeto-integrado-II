@@ -63,7 +63,47 @@
 
                 </div>
             </section>
+<section class="section">
+    <h2>Criar Quiz</h2>
 
+    <div class="work-container">
+        <form id="formQuiz">
+
+            <label for="disciplinaQuiz">Disciplina</label>
+            <select id="disciplinaQuiz" required>
+                <option value="">Selecione uma disciplina</option>
+                <option value="1">Sistemas Operacionais</option>
+                <option value="2">Lógica e Matemática Computacional</option>
+                <option value="3">Modelagem de Dados</option>
+            </select>
+
+            <label for="tituloQuiz">Título do quiz</label>
+            <input
+                type="text"
+                id="tituloQuiz"
+                placeholder="Ex: Revisão de Sistemas Operacionais"
+                required
+            >
+
+            <hr>
+
+            <h3>Cadastrar perguntas</h3>
+
+            <div id="listaPerguntas"></div>
+
+            <button type="button" id="adicionarPergunta">
+                + Adicionar pergunta
+            </button>
+
+            <button type="submit" id="publicarQuiz">
+                Publicar quiz
+            </button>
+
+        </form>
+
+        <p id="mensagemQuiz"></p>
+    </div>
+</section>
         </main>
     </div>
 

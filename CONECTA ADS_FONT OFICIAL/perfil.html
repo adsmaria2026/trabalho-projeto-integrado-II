@@ -36,6 +36,7 @@
                 <div class="profile">👤</div>
             </header>
 
+            <!-- Informações do estudante -->
             <section class="section">
                 <div class="material">
                     <h2 id="nomeAluno" style="color:#243b64; margin-bottom:18px;">
@@ -58,29 +59,63 @@
                     </p>
                 </div>
             </section>
+<!-- Painel de desempenho -->
+<section class="section">
+    <h2 style="color:#243b64; margin-bottom:20px;">
+        Meu desempenho 📊
+    </h2>
+
+    <div class="materials desempenho-grid">
+        <div class="material">
+            <h3>Quizzes realizados</h3>
+            <h2 id="totalQuizzes">0</h2>
+        </div>
+
+        <div class="material">
+            <h3>Questões respondidas</h3>
+            <h2 id="totalQuestoes">0</h2>
+        </div>
+
+        <div class="material">
+            <h3>Média de acertos</h3>
+            <h2 id="mediaAcertos">0%</h2>
+        </div>
+    </div>
+</section>
+            <!-- Histórico de quizzes -->
+            <section class="section">
+                <h2 style="color:#243b64; margin-bottom:20px;">
+                    Histórico de Quizzes 📝
+                </h2>
+
+                <div id="historicoQuizzes">
+                    Carregando histórico...
+                </div>
+            </section>
         </main>
     </div>
 
     <script>
         function sairDaConta() {
-    localStorage.removeItem("alunoLogado");
-    window.location.href = "login.html";
-}
-function verificarLogin() {
-    const alunoLogado = localStorage.getItem("alunoLogado");
+            localStorage.removeItem("alunoLogado");
+            window.location.href = "login.html";
+        }
 
-    if (!alunoLogado) {
-        window.location.replace("login.html");
-        return false;
-    }
+        function verificarLogin() {
+            const alunoLogado = localStorage.getItem("alunoLogado");
 
-    return true;
-}
+            if (!alunoLogado) {
+                window.location.replace("login.html");
+                return false;
+            }
+
+            return true;
+        }
+
         async function carregarPerfil() {
             const nomeElemento = document.getElementById("nomeAluno");
             const raElemento = document.getElementById("raAluno");
 
-            // Recupera o estudante que entrou pelo login
             let alunoLogado;
 
             try {
@@ -92,13 +127,14 @@ function verificarLogin() {
             }
 
             if (!alunoLogado || !alunoLogado.ra) {
-                nomeElemento.textContent = "Faça login para ver seu perfil";
+                nomeElemento.textContent =
+                    "Faça login para ver seu perfil";
+
                 raElemento.textContent = "Não informado";
                 return;
             }
 
             try {
-                // Busca os dados atualizados no servidor e no MySQL
                 const resposta = await fetch(
                     `/api/perfil/${encodeURIComponent(alunoLogado.ra)}`
                 );
@@ -129,9 +165,127 @@ function verificarLogin() {
             }
         }
 
-        if (verificarLogin()) {
-    carregarPerfil();
+        // Carregar histórico de quizzes
+        async function carregarHistorico() {
+            const areaHistorico =
+                document.getElementById("historicoQuizzes");
+
+            let alunoLogado;
+
+            try {
+                alunoLogado = JSON.parse(
+                    localStorage.getItem("alunoLogado")
+                );
+            } catch (erro) {
+                alunoLogado = null;
+            }
+
+            if (!alunoLogado || !alunoLogado.id) {
+                areaHistorico.textContent =
+                    "Não foi possível identificar o estudante.";
+                return;
+            }
+
+            try {
+                const resposta = await fetch(
+                    `/api/historico-quiz/${alunoLogado.id}`
+                );
+
+                const historico = await resposta.json();
+
+                if (!resposta.ok) {
+                    throw new Error(
+                        historico.mensagem || "Erro ao buscar histórico."
+                    );
+                }
+
+               areaHistorico.innerHTML = "";
+
+// Calcular desempenho do estudante
+const totalQuizzes = historico.length;
+
+const totalQuestoes = historico.reduce(
+    (total, tentativa) =>
+        total + Number(tentativa.total_perguntas),
+    0
+);
+
+const totalAcertos = historico.reduce(
+    (total, tentativa) =>
+        total + Number(tentativa.pontuacao),
+    0
+);
+
+const media = totalQuestoes > 0
+    ? Math.round((totalAcertos / totalQuestoes) * 100)
+    : 0;
+
+// Atualizar os indicadores na tela
+document.getElementById("totalQuizzes").textContent =
+    totalQuizzes;
+
+document.getElementById("totalQuestoes").textContent =
+    totalQuestoes;
+
+document.getElementById("mediaAcertos").textContent =
+    media + "%";
+
+if (historico.length === 0) {
+    areaHistorico.textContent =
+        "Você ainda não realizou nenhum quiz.";
+    return;
 }
+
+                historico.forEach(tentativa => {
+                    const card = document.createElement("div");
+                    card.className = "material";
+                    card.style.marginBottom = "18px";
+
+                    const titulo = document.createElement("h3");
+                    titulo.style.color = "#243b64";
+                    titulo.textContent =
+                        tentativa.titulo_quiz || "Quiz sem identificação";
+
+                    const disciplina = document.createElement("p");
+                    disciplina.style.marginTop = "10px";
+                    disciplina.textContent =
+                        "Disciplina: " + tentativa.disciplina;
+
+                    const pontuacao = document.createElement("p");
+                    pontuacao.style.marginTop = "10px";
+                    pontuacao.textContent =
+                        `Pontuação: ${tentativa.pontuacao}/${tentativa.total_perguntas}`;
+
+                    const data = document.createElement("p");
+                    data.style.marginTop = "10px";
+
+                    const dataFormatada = new Date(
+                        tentativa.data_tentativa
+                    ).toLocaleString("pt-BR");
+
+                    data.textContent =
+                        "Data da tentativa: " + dataFormatada;
+
+                    card.appendChild(titulo);
+                    card.appendChild(disciplina);
+                    card.appendChild(pontuacao);
+                    card.appendChild(data);
+
+                    areaHistorico.appendChild(card);
+                });
+
+            } catch (erro) {
+                console.error("Erro ao carregar histórico:", erro);
+
+                areaHistorico.textContent =
+                    "Não foi possível carregar o histórico de quizzes.";
+            }
+        }
+
+        if (verificarLogin()) {
+            carregarPerfil();
+            carregarHistorico();
+        }
     </script>
 </body>
 </html>
