@@ -67,18 +67,8 @@ formulario.addEventListener("submit", async (event) => {
 // Sair da área do professor
 document.getElementById("sair").addEventListener("click", () => {
     localStorage.removeItem("professorLogado");
+    window.location.href = "index.html";
 });
-// ==========================================
-// CRIAR QUIZ PELO PROFESSOR
-// ==========================================
-
-const formQuiz = document.getElementById("formQuiz");
-const listaPerguntas = document.getElementById("listaPerguntas");
-const botaoAdicionar = document.getElementById("adicionarPergunta");
-const mensagemQuiz = document.getElementById("mensagemQuiz");
-
-let contadorPerguntas = 0;
-
 // Adicionar uma nova pergunta
 botaoAdicionar.addEventListener("click", () => {
     contadorPerguntas++;

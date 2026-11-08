@@ -22,7 +22,7 @@
 
             <div class="sidebar-bottom">
                 <a href="#">⚙️ Configurações</a>
-                <a href="login.html" id="sair">🚪 Sair</a>
+                <a href="index.html" id="sair">🚪 Sair</a>
             </div>
         </aside>
 
@@ -52,9 +52,11 @@
             window.location.href = "login.html";
         }
 
-        document.getElementById("sair").addEventListener("click", function() {
-            localStorage.removeItem("alunoLogado");
-        });
+     document.getElementById("sair").addEventListener("click", function(event) {
+    event.preventDefault();
+    localStorage.removeItem("alunoLogado");
+    window.location.href = "index.html";
+});
     </script>
 </body>
 </html>
