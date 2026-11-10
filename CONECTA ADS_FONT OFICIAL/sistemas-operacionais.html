@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,7 +6,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistemas Operacionais - Conecta ADS</title>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Estilos exclusivos da página de Estudos */
+        .estudos-page .section {
+            margin-top: 30px;
+        }
+
+        .estudos-page .section h2 {
+            color: #243f68;
+            margin-bottom: 18px;
+            font-size: 23px;
+        }
+
+        .estudos-page .study-form {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 13px;
+            border-left: 5px solid #ff861b;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .estudos-page .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 18px;
+        }
+
+        .estudos-page .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .estudos-page label {
+            color: #243f68;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .estudos-page input,
+        .estudos-page select,
+        .estudos-page textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border: 1px solid #d8deea;
+            border-radius: 8px;
+            background: #f9faff;
+            font-family: inherit;
+            font-size: 14px;
+            color: #333333;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .estudos-page input:focus,
+        .estudos-page select:focus,
+        .estudos-page textarea:focus {
+            border-color: #ff861b;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(255, 134, 27, 0.12);
+        }
+
+        .estudos-page textarea {
+            resize: vertical;
+            min-height: 95px;
+        }
+
+        .estudos-page .btn-publicar {
+            background: #ff861b;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 13px 22px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: 0.2s;
+            align-self: flex-start;
+        }
+
+        .estudos-page .btn-publicar:hover {
+            background: #e8750d;
+            transform: translateY(-1px);
+        }
+
+        .estudos-page .btn-publicar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .estudos-page #mensagemMaterial {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #243f68;
+        }
+
+        .estudos-page .materials {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .estudos-page .study-card {
+            background: #ffffff;
+            padding: 22px;
+            border-radius: 12px;
+            border-left: 5px solid #ff861b;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 0;
+        }
+
+        .estudos-page .study-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.09);
+        }
+
+        .estudos-page .study-card h3 {
+            color: #243f68;
+            font-size: 18px;
+            margin: 0 0 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .estudos-page .study-card p {
+            color: #68758a;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 7px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .estudos-page .study-card .material-type {
+            display: inline-block;
+            background: #fff0df;
+            color: #bd5d00;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+
+        .estudos-page .study-card .material-link {
+            display: inline-block;
+            margin-top: 12px;
+            color: #244b83;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .estudos-page .study-card .material-link:hover {
+            color: #ff861b;
+            text-decoration: underline;
+        }
+
+        .estudos-page .study-card .invalid-link {
+            color: #c0392b;
+            font-size: 13px;
+        }
+
+        .estudos-page .btn-excluir {
+            display: block;
+            margin-top: 15px;
+            background: #dc3545;
+            color: #ffffff;
+            border: none;
+            border-radius: 7px;
+            padding: 9px 17px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .estudos-page .btn-excluir:hover {
+            background: #bd2635;
+        }
+
+        .estudos-page .empty-message {
+            background: #ffffff;
+            color: #68758a;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 650px) {
+            .estudos-page .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .estudos-page .study-form {
+                padding: 18px;
+            }
+
+            .estudos-page .materials {
+                grid-template-columns: 1fr;
+            }
+
+            .estudos-page .btn-publicar {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
+
 <body>
     <div class="container">
         <aside class="sidebar">
@@ -26,7 +241,8 @@
             </div>
         </aside>
 
-        <main class="main-content">
+        <main class="main-content estudos-page">
+
             <header>
                 <div>
                     <h1>Sistemas Operacionais 💻</h1>
@@ -38,27 +254,47 @@
             <section class="section">
                 <h2>Compartilhar material</h2>
 
-                <form id="formMaterial" class="material">
-                    <label for="titulo">Título do material</label>
-                    <input type="text" id="titulo" required maxlength="180"
-                        placeholder="Ex.: Introdução aos Sistemas Operacionais">
+                <form id="formMaterial" class="study-form">
 
-                    <label for="tipo">Tipo de material</label>
-                    <select id="tipo" required>
-                        <option value="resumo">Resumo</option>
-                        <option value="exercicio">Exercício</option>
-                        <option value="dica">Anotação</option>
-                    </select>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="titulo">Título do material</label>
+                            <input
+                                type="text"
+                                id="titulo"
+                                required
+                                maxlength="180"
+                                placeholder="Ex.: Introdução aos Sistemas Operacionais">
+                        </div>
 
-                    <label for="descricao">Descrição</label>
-                    <textarea id="descricao" rows="3"
-                        placeholder="Descreva brevemente o conteúdo..."></textarea>
+                        <div class="form-group">
+                            <label for="tipo">Tipo de material</label>
+                            <select id="tipo" required>
+                                <option value="resumo">Resumo</option>
+                                <option value="exercicio">Exercício</option>
+                                <option value="dica">Anotação</option>
+                            </select>
+                        </div>
+                    </div>
 
-                    <label for="link">Link do material</label>
-                    <input type="url" id="link"
-                        placeholder="https://..." required>
+                    <div class="form-group">
+                        <label for="descricao">Descrição</label>
+                        <textarea
+                            id="descricao"
+                            rows="3"
+                            placeholder="Descreva brevemente o conteúdo..."></textarea>
+                    </div>
 
-                    <button type="submit" id="btnPublicar">
+                    <div class="form-group">
+                        <label for="link">Link do material</label>
+                        <input
+                            type="url"
+                            id="link"
+                            placeholder="https://..."
+                            required>
+                    </div>
+
+                    <button type="submit" id="btnPublicar" class="btn-publicar">
                         Compartilhar material
                     </button>
 
@@ -68,10 +304,12 @@
 
             <section class="section">
                 <h2>Materiais compartilhados</h2>
+
                 <div class="materials" id="lista-materiais">
-                    <p>Carregando materiais...</p>
+                    <p class="empty-message">Carregando materiais...</p>
                 </div>
             </section>
+
         </main>
     </div>
 
@@ -87,6 +325,48 @@
             }
         }
 
+        // Excluir material publicado pelo próprio estudante
+        async function excluirMaterial(idMaterial) {
+            const aluno = obterAluno();
+
+            if (!aluno || !aluno.id) {
+                alert("Faça login novamente.");
+                return;
+            }
+
+            if (!confirm("Tem certeza que deseja excluir este material?")) {
+                return;
+            }
+
+            try {
+                const resposta = await fetch(
+                    `${API}/materiais/${idMaterial}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            id_estudante: aluno.id
+                        })
+                    }
+                );
+
+                const resultado = await resposta.json();
+
+                if (!resposta.ok) {
+                    throw new Error(resultado.mensagem);
+                }
+
+                alert(resultado.mensagem);
+                await carregarMateriais();
+
+            } catch (erro) {
+                alert(erro.message || "Erro ao excluir material.");
+            }
+        }
+
+        // Buscar e exibir materiais
         async function carregarMateriais() {
             const lista = document.getElementById("lista-materiais");
 
@@ -105,20 +385,27 @@
 
                 if (materiais.length === 0) {
                     lista.innerHTML =
-                        "<p>Nenhum material compartilhado ainda.</p>";
+                        '<p class="empty-message">Nenhum material compartilhado ainda. Seja o primeiro a compartilhar!</p>';
                     return;
                 }
 
                 materiais.forEach(material => {
                     const card = document.createElement("div");
-                    card.className = "material";
+                    card.className = "study-card";
 
                     const titulo = document.createElement("h3");
                     titulo.textContent = material.titulo;
 
-                    const tipo = document.createElement("p");
-                    tipo.textContent =
-                        "Tipo: " + material.tipo;
+                    const tipo = document.createElement("span");
+                    tipo.className = "material-type";
+
+                    const tipos = {
+                        resumo: "Resumo",
+                        exercicio: "Exercício",
+                        dica: "Anotação"
+                    };
+
+                    tipo.textContent = tipos[material.tipo] || material.tipo;
 
                     const descricao = document.createElement("p");
                     descricao.textContent =
@@ -144,21 +431,45 @@
                         try {
                             const url = new URL(material.caminho_arquivo);
 
-                            if (url.protocol === "https:" ||
-                                url.protocol === "http:") {
+                            if (
+                                url.protocol === "https:" ||
+                                url.protocol === "http:"
+                            ) {
                                 const link = document.createElement("a");
                                 link.href = url.href;
                                 link.target = "_blank";
                                 link.rel = "noopener noreferrer";
                                 link.textContent = "Abrir material";
+                                link.className = "material-link";
 
                                 card.appendChild(link);
                             }
                         } catch {
                             const aviso = document.createElement("p");
                             aviso.textContent = "Link inválido.";
+                            aviso.className = "invalid-link";
                             card.appendChild(aviso);
                         }
+                    }
+
+                    // Mostrar botão somente para o autor do material
+                    const aluno = obterAluno();
+
+                    if (
+                        aluno &&
+                        Number(aluno.id) === Number(material.id_estudante)
+                    ) {
+                        const botaoExcluir = document.createElement("button");
+
+                        botaoExcluir.textContent = "Excluir";
+                        botaoExcluir.type = "button";
+                        botaoExcluir.className = "btn-excluir";
+
+                        botaoExcluir.addEventListener("click", () => {
+                            excluirMaterial(material.id_material);
+                        });
+
+                        card.appendChild(botaoExcluir);
                     }
 
                     lista.appendChild(card);
@@ -167,18 +478,21 @@
             } catch (erro) {
                 console.error("Erro ao carregar materiais:", erro);
                 lista.innerHTML =
-                    "<p>Não foi possível carregar os materiais.</p>";
+                    '<p class="empty-message">Não foi possível carregar os materiais.</p>';
             }
         }
 
+        // Compartilhar material
         document.getElementById("formMaterial")
             .addEventListener("submit", async function(event) {
 
                 event.preventDefault();
 
                 const aluno = obterAluno();
+
                 const mensagem =
                     document.getElementById("mensagemMaterial");
+
                 const botao =
                     document.getElementById("btnPublicar");
 

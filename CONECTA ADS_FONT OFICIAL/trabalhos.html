@@ -6,94 +6,203 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trabalhos - Conecta ADS</title>
     <link rel="stylesheet" href="style.css">
+
     <style>
+        /* Formulário */
         .form-trabalho {
-            background: white;
-            padding: 22px;
+            background: #ffffff;
+            padding: 25px;
             border-radius: 12px;
             margin-bottom: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+            border: 1px solid #e9edf3;
+        }
+
+        .form-trabalho label {
+            display: block;
+            font-weight: 600;
+            color: #333333;
+            margin-top: 12px;
         }
 
         .form-trabalho input,
         .form-trabalho select,
         .form-trabalho textarea {
             width: 100%;
-            padding: 11px;
-            margin: 8px 0 15px;
-            border: 1px solid #ddd;
+            padding: 12px;
+            margin: 8px 0 12px;
+            border: 1px solid #d9dfe8;
             border-radius: 7px;
             font: inherit;
             box-sizing: border-box;
+            background: #ffffff;
+        }
+
+        .form-trabalho input:focus,
+        .form-trabalho select:focus,
+        .form-trabalho textarea:focus,
+        .campo-comentario:focus {
+            outline: none;
+            border-color: #2457a7;
+            box-shadow: 0 0 0 2px rgba(36, 87, 167, 0.12);
         }
 
         .form-trabalho textarea {
-            min-height: 85px;
+            min-height: 90px;
             resize: vertical;
         }
 
         .form-trabalho button,
         .botao-comentar {
             background: #2457a7;
-            color: white;
+            color: #ffffff;
             border: none;
-            padding: 11px 18px;
+            padding: 11px 20px;
             border-radius: 7px;
             cursor: pointer;
+            font: inherit;
+            font-weight: 600;
+            transition: background 0.2s;
         }
 
-        .material {
-            margin-bottom: 20px;
+        .form-trabalho button:hover,
+        .botao-comentar:hover {
+            background: #193f7c;
+        }
+
+        .form-trabalho button:disabled,
+        .botao-comentar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Lista de trabalhos */
+        #listaTrabalhos {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .trabalho-card {
+            background: #ffffff;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid #e5eaf1;
+            border-left: 5px solid #2457a7;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+            margin-bottom: 0;
+        }
+
+        .trabalho-card h3 {
+            color: #2457a7;
+            font-size: 19px;
+            margin: 0 0 15px;
+        }
+
+        .trabalho-card p {
+            color: #444444;
+            line-height: 1.6;
+            margin: 9px 0;
+            overflow-wrap: anywhere;
         }
 
         .informacao-trabalho {
-            color: #666;
-            font-size: 14px;
+            color: #777777 !important;
+            font-size: 13px;
         }
 
+        .link-trabalho {
+            display: inline-block;
+            margin-top: 10px;
+            color: #2457a7;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .link-trabalho:hover {
+            text-decoration: underline;
+        }
+
+        /* Comentários */
         .comentarios {
-            margin-top: 18px;
-            padding-top: 12px;
-            border-top: 1px solid #eee;
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid #e5eaf1;
+        }
+
+        .comentarios h4 {
+            color: #333333;
+            font-size: 16px;
+            margin: 0 0 12px;
         }
 
         .comentario {
             background: #f5f7fa;
-            padding: 10px;
-            border-radius: 7px;
+            padding: 13px;
+            border-radius: 8px;
             margin: 10px 0;
+            border: 1px solid #edf0f4;
+        }
+
+        .comentario p {
+            margin: 0 0 8px;
+        }
+
+        .comentario strong {
+            color: #2457a7;
+            font-size: 13px;
         }
 
         .comentario small {
-            color: #777;
+            color: #777777;
+            font-size: 12px;
         }
 
         .campo-comentario {
             width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
+            min-height: 75px;
+            padding: 11px;
+            margin: 10px 0;
+            border: 1px solid #d9dfe8;
             border-radius: 7px;
             box-sizing: border-box;
             font: inherit;
+            resize: vertical;
         }
 
         .mensagem {
             margin: 12px 0;
             font-weight: bold;
+            color: #2457a7;
         }
 
-        .link-trabalho {
-            display: inline-block;
-            margin-top: 8px;
+        .lista-vazia {
+            background: #ffffff;
+            padding: 22px;
+            border-radius: 10px;
+            color: #666666;
+            border: 1px solid #e5eaf1;
+        }
+
+        @media (max-width: 600px) {
+            .form-trabalho,
+            .trabalho-card {
+                padding: 16px;
+            }
+
+            .form-trabalho button {
+                width: 100%;
+            }
         }
     </style>
 </head>
+
 <body>
 <div class="container">
 
     <aside class="sidebar">
         <h2>Conecta <span>ADS</span></h2>
+
         <nav>
             <a href="inicio.html">🏠 Início</a>
             <a href="estudos.html">📚 Estudos</a>
@@ -101,6 +210,7 @@
             <a href="quiz.html">📝 Quiz</a>
             <a href="perfil.html">👤 Meu perfil</a>
         </nav>
+
         <div class="sidebar-bottom">
             <a href="#">⚙️ Configurações</a>
             <a href="login.html">🚪 Sair</a>
@@ -156,8 +266,9 @@
 
         <section class="section">
             <h2>Trabalhos disponíveis</h2>
-            <div class="materials" id="listaTrabalhos">
-                <p>Carregando trabalhos...</p>
+
+            <div id="listaTrabalhos">
+                <p class="lista-vazia">Carregando trabalhos...</p>
             </div>
         </section>
 
@@ -180,56 +291,67 @@ function formatarData(data) {
 }
 
 // Publicar trabalho
-document.getElementById("formTrabalho").addEventListener("submit", async function(event) {
-    event.preventDefault();
+document.getElementById("formTrabalho")
+    .addEventListener("submit", async function(event) {
 
-    const aluno = obterAluno();
-    const mensagem = document.getElementById("mensagemFormulario");
-    const botao = document.getElementById("botaoPublicar");
+        event.preventDefault();
 
-    if (!aluno || !aluno.id) {
-        mensagem.textContent = "Faça login novamente para publicar um trabalho.";
-        return;
-    }
+        const aluno = obterAluno();
+        const mensagem = document.getElementById("mensagemFormulario");
+        const botao = document.getElementById("botaoPublicar");
 
-    const dados = {
-        id_estudante: aluno.id,
-        id_disciplina: Number(document.getElementById("disciplina").value),
-        titulo: document.getElementById("titulo").value,
-        descricao: document.getElementById("descricao").value,
-        objetivo: document.getElementById("objetivo").value,
-        caminho_arquivo: document.getElementById("arquivo").value
-    };
-
-    try {
-        botao.disabled = true;
-        botao.textContent = "Publicando...";
-
-        const resposta = await fetch(`${API}/trabalhos`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(dados)
-        });
-
-        const resultado = await resposta.json();
-
-        if (!resposta.ok) {
-            throw new Error(resultado.mensagem || "Erro ao publicar.");
+        if (!aluno || !aluno.id) {
+            mensagem.textContent =
+                "Faça login novamente para publicar um trabalho.";
+            return;
         }
 
-        mensagem.textContent = resultado.mensagem;
-        this.reset();
-        await carregarTrabalhos();
+        const dados = {
+            id_estudante: aluno.id,
+            id_disciplina: Number(
+                document.getElementById("disciplina").value
+            ),
+            titulo: document.getElementById("titulo").value,
+            descricao: document.getElementById("descricao").value,
+            objetivo: document.getElementById("objetivo").value,
+            caminho_arquivo: document.getElementById("arquivo").value
+        };
 
-    } catch (erro) {
-        mensagem.textContent = erro.message;
-    } finally {
-        botao.disabled = false;
-        botao.textContent = "Publicar trabalho";
-    }
-});
+        try {
+            botao.disabled = true;
+            botao.textContent = "Publicando...";
+            mensagem.textContent = "";
+
+            const resposta = await fetch(`${API}/trabalhos`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dados)
+            });
+
+            const resultado = await resposta.json();
+
+            if (!resposta.ok) {
+                throw new Error(
+                    resultado.mensagem || "Erro ao publicar."
+                );
+            }
+
+            mensagem.textContent = resultado.mensagem;
+
+            this.reset();
+
+            await carregarTrabalhos();
+
+        } catch (erro) {
+            mensagem.textContent = erro.message;
+
+        } finally {
+            botao.disabled = false;
+            botao.textContent = "Publicar trabalho";
+        }
+    });
 
 // Carregar trabalhos
 async function carregarTrabalhos() {
@@ -247,48 +369,70 @@ async function carregarTrabalhos() {
         lista.innerHTML = "";
 
         if (trabalhos.length === 0) {
-            lista.textContent = "Ainda não existem trabalhos publicados.";
+            lista.innerHTML =
+                '<p class="lista-vazia">Ainda não existem trabalhos publicados.</p>';
             return;
         }
 
         trabalhos.forEach(trabalho => {
+
             const card = document.createElement("div");
-            card.className = "material";
+            card.className = "trabalho-card";
 
             const titulo = document.createElement("h3");
             titulo.textContent = trabalho.titulo;
 
             const descricao = document.createElement("p");
-            descricao.textContent = trabalho.descricao || "Sem descrição.";
+            descricao.textContent =
+                trabalho.descricao || "Sem descrição.";
 
             const disciplina = document.createElement("p");
             disciplina.innerHTML = "<strong>Disciplina:</strong> ";
-            disciplina.append(document.createTextNode(trabalho.disciplina));
+            disciplina.append(
+                document.createTextNode(trabalho.disciplina)
+            );
 
             const objetivo = document.createElement("p");
             objetivo.innerHTML = "<strong>Objetivo:</strong> ";
-            objetivo.append(document.createTextNode(trabalho.objetivo || "Não informado."));
+            objetivo.append(
+                document.createTextNode(
+                    trabalho.objetivo || "Não informado."
+                )
+            );
 
             const autor = document.createElement("p");
             autor.className = "informacao-trabalho";
-            autor.textContent = "Publicado por: " + trabalho.autor;
+            autor.textContent =
+                "Publicado por: " + trabalho.autor;
 
             const data = document.createElement("p");
             data.className = "informacao-trabalho";
-            data.textContent = "Data: " + formatarData(trabalho.data_publicacao);
+            data.textContent =
+                "Data: " + formatarData(trabalho.data_publicacao);
 
-            card.append(titulo, descricao, disciplina, objetivo, autor, data);
+            card.append(
+                titulo,
+                descricao,
+                disciplina,
+                objetivo,
+                autor,
+                data
+            );
 
+            // Link do trabalho
             if (trabalho.caminho_arquivo) {
                 const link = document.createElement("a");
+
                 link.className = "link-trabalho";
                 link.href = trabalho.caminho_arquivo;
                 link.target = "_blank";
                 link.rel = "noopener noreferrer";
                 link.textContent = "Visualizar trabalho";
+
                 card.appendChild(link);
             }
 
+            // Área de comentários
             const areaComentarios = document.createElement("div");
             areaComentarios.className = "comentarios";
 
@@ -304,9 +448,11 @@ async function carregarTrabalhos() {
 
             const botao = document.createElement("button");
             botao.className = "botao-comentar";
+            botao.type = "button";
             botao.textContent = "Comentar";
 
             botao.addEventListener("click", async () => {
+
                 const aluno = obterAluno();
 
                 if (!aluno || !aluno.id) {
@@ -339,14 +485,21 @@ async function carregarTrabalhos() {
                     const resultado = await resposta.json();
 
                     if (!resposta.ok) {
-                        throw new Error(resultado.mensagem || "Erro ao comentar.");
+                        throw new Error(
+                            resultado.mensagem || "Erro ao comentar."
+                        );
                     }
 
                     campo.value = "";
-                    await carregarComentarios(trabalho.id_trabalho, listaComentarios);
+
+                    await carregarComentarios(
+                        trabalho.id_trabalho,
+                        listaComentarios
+                    );
 
                 } catch (erro) {
                     alert(erro.message);
+
                 } finally {
                     botao.disabled = false;
                 }
@@ -362,11 +515,20 @@ async function carregarTrabalhos() {
             card.appendChild(areaComentarios);
             lista.appendChild(card);
 
-            carregarComentarios(trabalho.id_trabalho, listaComentarios);
+            carregarComentarios(
+                trabalho.id_trabalho,
+                listaComentarios
+            );
         });
 
     } catch (erro) {
-        lista.textContent = erro.message;
+        lista.innerHTML = "";
+
+        const aviso = document.createElement("p");
+        aviso.className = "lista-vazia";
+        aviso.textContent = erro.message;
+
+        lista.appendChild(aviso);
     }
 }
 
@@ -382,6 +544,7 @@ async function carregarComentarios(idTrabalho, elemento) {
         }
 
         const comentarios = await resposta.json();
+
         elemento.innerHTML = "";
 
         if (comentarios.length === 0) {
@@ -390,6 +553,7 @@ async function carregarComentarios(idTrabalho, elemento) {
         }
 
         comentarios.forEach(item => {
+
             const div = document.createElement("div");
             div.className = "comentario";
 
@@ -400,9 +564,11 @@ async function carregarComentarios(idTrabalho, elemento) {
             autor.textContent = item.autor;
 
             const data = document.createElement("small");
-            data.textContent = " • " + formatarData(item.data_comentario);
+            data.textContent =
+                " • " + formatarData(item.data_comentario);
 
             div.append(texto, autor, data);
+
             elemento.appendChild(div);
         });
 

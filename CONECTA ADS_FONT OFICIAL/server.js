@@ -488,6 +488,55 @@ app.post("/api/materiais", async (req, res) => {
         if (conexao) await conexao.end();
     }
 });
+
+
+// Excluir material publicado pelo próprio estudante
+app.delete("/api/materiais/:id_material", async (req, res) => {
+    const idMaterial = Number(req.params.id_material);
+    const idEstudante = Number(req.body.id_estudante);
+
+    if (
+        !Number.isInteger(idMaterial) || idMaterial < 1 ||
+        !Number.isInteger(idEstudante) || idEstudante < 1
+    ) {
+        return res.status(400).json({
+            mensagem: "Dados inválidos para excluir o material."
+        });
+    }
+
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [resultado] = await conexao.execute(
+            `DELETE FROM materiais
+             WHERE id_material = ?
+             AND id_estudante = ?`,
+            [idMaterial, idEstudante]
+        );
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({
+                mensagem: "Material não encontrado ou não pertence a você."
+            });
+        }
+
+        res.json({
+            mensagem: "Material excluído com sucesso!"
+        });
+
+    } catch (erro) {
+        console.error("ERRO AO EXCLUIR MATERIAL:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao excluir material."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
 // Buscar materiais de uma disciplina
 app.get("/api/materiais/:id_disciplina", async (req, res) => {
     let conexao;
@@ -506,6 +555,7 @@ app.get("/api/materiais/:id_disciplina", async (req, res) => {
         const [materiais] = await conexao.execute(
             `SELECT
                 m.id_material,
+                m.id_estudante,
                 m.titulo,
                 m.descricao,
                 m.tipo,
@@ -722,19 +772,21 @@ app.get("/api/quiz/:id_quiz", async (req, res) => {
             });
         }
 
-        const [perguntas] = await conexao.execute(
-            `SELECT
-                id_pergunta,
-                enunciado,
-                alternativa_a,
-                alternativa_b,
-                alternativa_c,
-                alternativa_d
-             FROM perguntas_quiz
-             WHERE id_quiz = ?
-             ORDER BY id_pergunta`,
-            [idQuiz]
-        );
+      const [perguntas] = await conexao.execute(
+    `SELECT
+        id_pergunta,
+        enunciado,
+        alternativa_a,
+        alternativa_b,
+        alternativa_c,
+        alternativa_d,
+        resposta_correta,
+        explicacao
+     FROM perguntas_quiz
+     WHERE id_quiz = ?
+     ORDER BY id_pergunta`,
+    [idQuiz]
+);
 
         res.json({
             quiz: quizzes[0],

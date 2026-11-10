@@ -147,13 +147,65 @@ async function finalizarQuiz() {
 
         mensagemQuiz.textContent = "Quiz finalizado com sucesso!";
 
-        resultadoQuiz.innerHTML = `
-            <div class="material">
-                <h2>Resultado do Quiz</h2>
-                <h3>Você acertou ${resultado.pontuacao} de ${resultado.total_perguntas} questões!</h3>
-                <p>Pontuação: ${resultado.pontuacao}/${resultado.total_perguntas}</p>
-            </div>
-        `;
+      resultadoQuiz.innerHTML = "";
+
+const painelResultado = document.createElement("div");
+painelResultado.className = "material";
+
+painelResultado.innerHTML = `
+    <h2>Resultado do Quiz</h2>
+    <h3>Você acertou ${resultado.pontuacao} de ${resultado.total_perguntas} questões!</h3>
+    <p>Pontuação: ${resultado.pontuacao}/${resultado.total_perguntas}</p>
+`;
+
+resultadoQuiz.appendChild(painelResultado);
+
+// Mostrar correção e explicação de cada pergunta
+dadosQuiz.perguntas.forEach((pergunta, indice) => {
+    const respostaAluno = respostas.find(
+        resposta => resposta.id_pergunta === pergunta.id_pergunta
+    );
+
+    const alternativas = {
+        A: pergunta.alternativa_a,
+        B: pergunta.alternativa_b,
+        C: pergunta.alternativa_c,
+        D: pergunta.alternativa_d
+    };
+
+    const acertou = respostaAluno.alternativa_escolhida === pergunta.resposta_correta;
+
+    const bloco = document.createElement("div");
+    bloco.className = "material";
+
+    const titulo = document.createElement("h3");
+    titulo.textContent = `${indice + 1}. ${pergunta.enunciado}`;
+
+    const situacao = document.createElement("p");
+    situacao.textContent = acertou ? "✓ Você acertou!" : "✗ Você errou!";
+    situacao.style.color = acertou ? "green" : "red";
+    situacao.style.fontWeight = "bold";
+
+    const suaResposta = document.createElement("p");
+    suaResposta.textContent =
+        `Sua resposta: ${respostaAluno.alternativa_escolhida}) ${alternativas[respostaAluno.alternativa_escolhida]}`;
+
+    const respostaCorreta = document.createElement("p");
+    respostaCorreta.textContent =
+        `Resposta correta: ${pergunta.resposta_correta}) ${alternativas[pergunta.resposta_correta]}`;
+
+    const explicacao = document.createElement("p");
+    explicacao.textContent =
+        `Explicação: ${pergunta.explicacao || "Não há explicação cadastrada para esta questão."}`;
+
+    bloco.appendChild(titulo);
+    bloco.appendChild(situacao);
+    bloco.appendChild(suaResposta);
+    bloco.appendChild(respostaCorreta);
+    bloco.appendChild(explicacao);
+
+    resultadoQuiz.appendChild(bloco);
+});
 
         areaPerguntas.querySelectorAll("input").forEach(input => {
             input.disabled = true;
