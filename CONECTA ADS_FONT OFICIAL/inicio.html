@@ -7,8 +7,10 @@
     <title>Início - Conecta ADS</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="home-body">
+
     <div class="container">
+
         <aside class="sidebar">
             <h2>Conecta <span>ADS</span></h2>
 
@@ -17,6 +19,7 @@
                 <a href="estudos.html">📚 Estudos</a>
                 <a href="trabalhos.html">📄 Trabalhos</a>
                 <a href="quiz.html">📝 Quiz</a>
+                <a href="forum.html">💬 Fórum</a>
                 <a href="perfil.html">👤 Meu perfil</a>
             </nav>
 
@@ -26,22 +29,92 @@
             </div>
         </aside>
 
-        <main class="main-content">
-            <header>
+        <main class="main-content home-page">
+
+            <header class="home-header">
                 <div>
-                    <h1>Olá, estudante!</h1>
-                    <p>Aprenda, compartilhe e evolua.</p>
+                    <span class="home-subtitle">ÁREA DO ESTUDANTE</span>
+                    <h1>Olá, estudante! 👋</h1>
+                    <p>Seu espaço de aprendizado começa aqui.</p>
                 </div>
-                <div class="profile">👤</div>
+
+                <a href="perfil.html" class="home-profile" title="Meu perfil">
+                    👤
+                </a>
             </header>
 
-            <section class="section">
-                <h2>Bem-vindo ao Conecta ADS!</h2>
-                <p>
-                    Um espaço colaborativo para compartilhar conhecimentos,
-                    acessar materiais de estudo e aprender com outros estudantes.
-                </p>
+            <section class="welcome-card home-banner">
+                <div class="banner-content">
+                    <span class="banner-tag">CONECTA ADS</span>
+                    <h2>Aprenda, compartilhe e evolua!</h2>
+                    <p>
+                        Um ambiente colaborativo para compartilhar conhecimentos,
+                        acessar materiais de estudo, praticar seus aprendizados
+                        e trocar experiências com outros estudantes de ADS.
+                    </p>
+                    <a href="estudos.html" class="banner-button">
+                        Explorar materiais
+                    </a>
+                </div>
+                <div class="banner-decoration">🎓</div>
             </section>
+
+            <section class="home-section">
+                <div class="home-section-heading">
+                    <div>
+                        <h2>Explore a plataforma</h2>
+                        <p>Escolha uma área para continuar seus estudos.</p>
+                    </div>
+                </div>
+
+                <div class="home-shortcuts">
+
+                    <a href="estudos.html" class="home-shortcut">
+                        <div class="shortcut-icon blue-icon">📚</div>
+                        <h3>Estudos</h3>
+                        <p>Acesse resumos, exercícios e materiais compartilhados.</p>
+                        <span>Explorar área →</span>
+                    </a>
+
+                    <a href="trabalhos.html" class="home-shortcut">
+                        <div class="shortcut-icon orange-icon">📄</div>
+                        <h3>Trabalhos</h3>
+                        <p>Compartilhe atividades e acompanhe as publicações.</p>
+                        <span>Acessar trabalhos →</span>
+                    </a>
+
+                    <a href="quiz.html" class="home-shortcut">
+                        <div class="shortcut-icon purple-icon">📝</div>
+                        <h3>Quiz</h3>
+                        <p>Teste seus conhecimentos e acompanhe seus resultados.</p>
+                        <span>Responder quiz →</span>
+                    </a>
+
+                    <a href="forum.html" class="home-shortcut">
+                        <div class="shortcut-icon green-icon">💬</div>
+                        <h3>Fórum</h3>
+                        <p>Compartilhe dúvidas e converse com outros estudantes.</p>
+                        <span>Participar do fórum →</span>
+                    </a>
+
+                </div>
+            </section>
+
+            <section class="home-message">
+                <div class="home-message-icon">💡</div>
+                <div>
+                    <h3>Aprender junto faz a diferença!</h3>
+                    <p>
+                        Compartilhe o que você sabe, tire suas dúvidas e aproveite
+                        o conhecimento da comunidade Conecta ADS.
+                    </p>
+                </div>
+            </section>
+
+            <footer class="home-footer">
+                Conecta ADS — Plataforma Colaborativa de Aprendizagem
+            </footer>
+
         </main>
     </div>
 
@@ -52,11 +125,12 @@
             window.location.href = "login.html";
         }
 
-     document.getElementById("sair").addEventListener("click", function(event) {
-    event.preventDefault();
-    localStorage.removeItem("alunoLogado");
-    window.location.href = "index.html";
-});
+        document.getElementById("sair").addEventListener("click", function(event) {
+            event.preventDefault();
+            localStorage.removeItem("alunoLogado");
+            window.location.href = "index.html";
+        });
     </script>
+
 </body>
 </html>

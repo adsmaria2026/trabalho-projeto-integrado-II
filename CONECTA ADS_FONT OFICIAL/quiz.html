@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,106 +9,115 @@
 </head>
 <body>
     <div class="container">
+
         <aside class="sidebar">
             <h2>Conecta <span>ADS</span></h2>
+
             <nav>
                 <a href="inicio.html">🏠 Início</a>
                 <a href="estudos.html">📚 Estudos</a>
-               <a href="trabalhos.html">📄 Trabalhos</a>
+                <a href="trabalhos.html">📄 Trabalhos</a>
                 <a href="quiz.html" class="active">📝 Quiz</a>
+                <a href="forum.html">💬 Fórum</a>
+                <a href="perfil.html">👤 Meu perfil</a>
             </nav>
+
             <div class="sidebar-bottom">
                 <a href="#">⚙️ Configurações</a>
                 <a href="login.html">🚪 Sair</a>
             </div>
         </aside>
-        <main class="main-content">
+
+        <main class="main-content quiz-page">
+
             <header>
                 <div>
+                    <p class="page-eyebrow">ÁREA DE AVALIAÇÃO</p>
                     <h1>Quiz 📝</h1>
                     <p>Teste seus conhecimentos das disciplinas de ADS.</p>
                 </div>
+
                 <div class="profile">👤</div>
             </header>
-           <section class="section">
-    <h2>Escolha uma disciplina</h2>
 
-    <div class="materials">
-        <div class="material">
-            <h3>Sistemas Operacionais</h3>
-            <p>Quizzes publicados pelos professores.</p>
-            <div id="quizzes-1"></div>
-        </div>
+            <section class="section">
+                <h2>Escolha uma disciplina</h2>
 
-        <div class="material">
-            <h3>Lógica e Matemática Computacional</h3>
-            <p>Quizzes publicados pelos professores.</p>
-            <div id="quizzes-2"></div>
-        </div>
+                <div class="materials">
 
-        <div class="material">
-            <h3>Modelagem de Dados</h3>
-            <p>Quizzes publicados pelos professores.</p>
-            <div id="quizzes-3"></div>
-        </div>
-    </div>
-</section>
+                    <div class="material">
+                        <h3>Sistemas Operacionais</h3>
+                        <p>Quizzes publicados pelos professores.</p>
+                        <div id="quizzes-1"></div>
+                    </div>
+
+                    <div class="material">
+                        <h3>Lógica e Matemática Computacional</h3>
+                        <p>Quizzes publicados pelos professores.</p>
+                        <div id="quizzes-2"></div>
+                    </div>
+
+                    <div class="material">
+                        <h3>Modelagem de Dados</h3>
+                        <p>Quizzes publicados pelos professores.</p>
+                        <div id="quizzes-3"></div>
+                    </div>
+
+                </div>
+            </section>
+
         </main>
-    </div>
-            </main>
     </div>
 
     <!-- SCRIPT PARA CARREGAR OS QUIZZES -->
     <script>
-    async function carregarQuizzes(idDisciplina) {
-        const lista = document.getElementById(`quizzes-${idDisciplina}`);
+        async function carregarQuizzes(idDisciplina) {
+            const lista = document.getElementById(`quizzes-${idDisciplina}`);
 
-        lista.innerHTML = "Carregando quizzes...";
+            lista.innerHTML = "Carregando quizzes...";
 
-        try {
-            const resposta = await fetch(`/api/quizzes/${idDisciplina}`);
+            try {
+                const resposta = await fetch(`/api/quizzes/${idDisciplina}`);
 
-            if (!resposta.ok) {
-                throw new Error("Erro ao buscar quizzes");
+                if (!resposta.ok) {
+                    throw new Error("Erro ao buscar quizzes");
+                }
+
+                const quizzes = await resposta.json();
+
+                lista.innerHTML = "";
+
+                if (quizzes.length === 0) {
+                    lista.textContent = "Nenhum quiz disponível nesta disciplina.";
+                    return;
+                }
+
+                quizzes.forEach(quiz => {
+                    const item = document.createElement("div");
+
+                    const titulo = document.createElement("h4");
+                    titulo.textContent = quiz.titulo;
+
+                    const link = document.createElement("a");
+                    link.textContent = "Iniciar quiz";
+                    link.href = `responder-quiz.html?id_quiz=${quiz.id_quiz}`;
+
+                    item.appendChild(titulo);
+                    item.appendChild(link);
+
+                    lista.appendChild(item);
+                });
+
+            } catch (erro) {
+                console.error(erro);
+                lista.textContent = "Não foi possível carregar os quizzes.";
             }
-
-            const quizzes = await resposta.json();
-
-            lista.innerHTML = "";
-
-            if (quizzes.length === 0) {
-                lista.textContent = "Nenhum quiz disponível nesta disciplina.";
-                return;
-            }
-
-            quizzes.forEach(quiz => {
-                const item = document.createElement("div");
-
-                const titulo = document.createElement("h4");
-                titulo.textContent = quiz.titulo;
-
-                const link = document.createElement("a");
-                link.textContent = "Iniciar quiz";
-                link.href = `responder-quiz.html?id_quiz=${quiz.id_quiz}`;
-
-                item.appendChild(titulo);
-                item.appendChild(link);
-
-                lista.appendChild(item);
-            });
-
-        } catch (erro) {
-            console.error(erro);
-            lista.textContent = "Não foi possível carregar os quizzes.";
         }
-    }
 
-    carregarQuizzes(1);
-    carregarQuizzes(2);
-    carregarQuizzes(3);
+        carregarQuizzes(1);
+        carregarQuizzes(2);
+        carregarQuizzes(3);
     </script>
 
-</body>
-</html>
 </body>
 </html>

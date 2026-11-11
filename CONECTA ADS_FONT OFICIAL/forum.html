@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fórum - Conecta ADS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="container">
+
+    <aside class="sidebar">
+        <h2>Conecta <span>ADS</span></h2>
+
+        <nav>
+            <a href="inicio.html">🏠 Início</a>
+            <a href="estudos.html">📚 Estudos</a>
+            <a href="trabalhos.html">📄 Trabalhos</a>
+            <a href="quiz.html">📝 Quiz</a>
+            <a href="forum.html" class="active">💬 Fórum</a>
+            <a href="perfil.html">👤 Meu perfil</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="#">⚙️ Configurações</a>
+            <a href="index.html" id="sair">🚪 Sair</a>
+        </div>
+    </aside>
+
+    <main class="main-content forum-page">
+
+        <header class="forum-header">
+            <div>
+                <p class="page-eyebrow">COMUNIDADE ACADÊMICA</p>
+                <h1>Fórum 💬</h1>
+                <p>Compartilhe conhecimentos, tire dúvidas e aprenda em conjunto.</p>
+            </div>
+
+            <div class="forum-header-icon">💬</div>
+        </header>
+
+        <section class="forum-banner">
+            <div>
+                <h2>Conhecimento compartilhado transforma!</h2>
+                <p>
+                    Participe das conversas, compartilhe suas experiências
+                    e ajude outros estudantes na jornada acadêmica.
+                </p>
+            </div>
+            <span>🎓</span>
+        </section>
+
+        <section class="forum-form-card">
+            <div class="forum-card-heading">
+                <div class="forum-heading-icon">✏️</div>
+                <div>
+                    <h2>Crie uma publicação</h2>
+                    <p>Compartilhe uma dúvida, ideia ou conhecimento.</p>
+                </div>
+            </div>
+
+            <form id="formPublicacao">
+
+                <label for="titulo">Título da publicação</label>
+                <input
+                    type="text"
+                    id="titulo"
+                    maxlength="200"
+                    placeholder="Ex.: Dúvida sobre banco de dados"
+                    required
+                >
+
+                <label for="conteudo">O que você gostaria de compartilhar?</label>
+                <textarea
+                    id="conteudo"
+                    placeholder="Escreva sua dúvida, ideia ou experiência..."
+                    required
+                ></textarea>
+
+                <div class="forum-form-footer">
+                    <span>💡 Compartilhe conhecimento com respeito.</span>
+                    <button type="submit">Publicar mensagem →</button>
+                </div>
+
+                <p id="mensagemPublicacao" class="mensagem-forum"></p>
+
+            </form>
+        </section>
+
+        <section class="forum-publicacoes">
+
+            <div class="forum-section-heading">
+                <div>
+                    <h2>Publicações dos estudantes</h2>
+                    <p>Acompanhe as conversas da comunidade.</p>
+                </div>
+                <span class="forum-section-icon">📢</span>
+            </div>
+
+            <div id="listaPublicacoes">
+                <p class="vazio-forum">Carregando publicações...</p>
+            </div>
+
+        </section>
+
+        <footer class="forum-footer">
+            Conecta ADS — Aprender, compartilhar e evoluir.
+        </footer>
+
+    </main>
+</div>
+
+<script src="forum.js"></script>
+</body>
+</html>

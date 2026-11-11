@@ -1415,6 +1415,213 @@ app.get("/api/historico-quiz/:id_estudante", async (req, res) => {
         if (conexao) await conexao.end();
     }
 });
+
+ // ==========================================
+// FÓRUM - PUBLICAÇÕES DOS ESTUDANTES
+// ==========================================
+
+// Publicar uma discussão
+app.post("/api/forum/publicacoes", async (req, res) => {
+    const idEstudante = Number(req.body.id_estudante);
+    const titulo = req.body.titulo;
+    const conteudo = req.body.conteudo;
+
+    if (
+        !Number.isInteger(idEstudante) || idEstudante < 1 ||
+        !titulo || !titulo.trim() ||
+        !conteudo || !conteudo.trim()
+    ) {
+        return res.status(400).json({
+            mensagem: "Preencha o título e o conteúdo da publicação."
+        });
+    }
+
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [alunos] = await conexao.execute(
+            "SELECT id_estudante FROM estudantes WHERE id_estudante = ?",
+            [idEstudante]
+        );
+
+        if (alunos.length === 0) {
+            return res.status(404).json({
+                mensagem: "Aluno não encontrado."
+            });
+        }
+
+        await conexao.execute(
+            `INSERT INTO forum_publicacoes
+            (id_estudante, titulo, conteudo)
+            VALUES (?, ?, ?)`,
+            [idEstudante, titulo.trim(), conteudo.trim()]
+        );
+
+        res.status(201).json({
+            mensagem: "Publicação realizada com sucesso!"
+        });
+
+    } catch (erro) {
+        console.error("ERRO AO PUBLICAR NO FÓRUM:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao publicar no fórum."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+
+// Listar publicações do fórum
+app.get("/api/forum/publicacoes", async (req, res) => {
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [publicacoes] = await conexao.execute(
+            `SELECT
+                f.id_publicacao,
+                f.id_estudante,
+                f.titulo,
+                f.conteudo,
+                f.data_publicacao,
+                e.nome_completo AS autor
+             FROM forum_publicacoes f
+             INNER JOIN estudantes e
+                ON f.id_estudante = e.id_estudante
+             ORDER BY f.data_publicacao DESC`
+        );
+
+        res.json(publicacoes);
+
+    } catch (erro) {
+        console.error("ERRO AO BUSCAR PUBLICAÇÕES:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao carregar as publicações."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+
+// Publicar comentário no fórum
+app.post("/api/forum/publicacoes/:id_publicacao/comentarios", async (req, res) => {
+    const idPublicacao = Number(req.params.id_publicacao);
+    const idEstudante = Number(req.body.id_estudante);
+    const comentario = req.body.comentario;
+
+    if (
+        !Number.isInteger(idPublicacao) || idPublicacao < 1 ||
+        !Number.isInteger(idEstudante) || idEstudante < 1 ||
+        !comentario || !comentario.trim()
+    ) {
+        return res.status(400).json({
+            mensagem: "Digite um comentário válido."
+        });
+    }
+
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [publicacoes] = await conexao.execute(
+            "SELECT id_publicacao FROM forum_publicacoes WHERE id_publicacao = ?",
+            [idPublicacao]
+        );
+
+        if (publicacoes.length === 0) {
+            return res.status(404).json({
+                mensagem: "Publicação não encontrada."
+            });
+        }
+
+        const [alunos] = await conexao.execute(
+            "SELECT id_estudante FROM estudantes WHERE id_estudante = ?",
+            [idEstudante]
+        );
+
+        if (alunos.length === 0) {
+            return res.status(404).json({
+                mensagem: "Aluno não encontrado."
+            });
+        }
+
+        await conexao.execute(
+            `INSERT INTO forum_comentarios
+            (id_publicacao, id_estudante, comentario)
+            VALUES (?, ?, ?)`,
+            [idPublicacao, idEstudante, comentario.trim()]
+        );
+
+        res.status(201).json({
+            mensagem: "Comentário publicado com sucesso!"
+        });
+
+    } catch (erro) {
+        console.error("ERRO AO COMENTAR NO FÓRUM:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao publicar comentário."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
+
+
+// Buscar comentários de uma publicação
+app.get("/api/forum/publicacoes/:id_publicacao/comentarios", async (req, res) => {
+    const idPublicacao = Number(req.params.id_publicacao);
+
+    if (!Number.isInteger(idPublicacao) || idPublicacao < 1) {
+        return res.status(400).json({
+            mensagem: "Publicação inválida."
+        });
+    }
+
+    let conexao;
+
+    try {
+        conexao = await conectarBanco();
+
+        const [comentarios] = await conexao.execute(
+            `SELECT
+                c.id_comentario,
+                c.comentario,
+                c.data_comentario,
+                e.id_estudante,
+                e.nome_completo AS autor
+             FROM forum_comentarios c
+             INNER JOIN estudantes e
+                ON c.id_estudante = e.id_estudante
+             WHERE c.id_publicacao = ?
+             ORDER BY c.data_comentario ASC`,
+            [idPublicacao]
+        );
+
+        res.json(comentarios);
+
+    } catch (erro) {
+        console.error("ERRO AO BUSCAR COMENTÁRIOS DO FÓRUM:", erro);
+
+        res.status(500).json({
+            mensagem: "Erro ao carregar comentários."
+        });
+
+    } finally {
+        if (conexao) await conexao.end();
+    }
+});
 app.listen(PORT, () => {
     console.log(`Servidor iniciado na porta ${PORT}`);
 });

@@ -3,12 +3,16 @@ const areaPerguntas = document.getElementById("areaPerguntas");
 const tituloQuiz = document.getElementById("tituloQuiz");
 const mensagemQuiz = document.getElementById("mensagemQuiz");
 const resultadoQuiz = document.getElementById("resultadoQuiz");
+
 let dadosQuiz = null;
+
 // Identificar o quiz selecionado
 const parametros = new URLSearchParams(window.location.search);
 const idQuiz = parametros.get("id_quiz");
+
 const alunoSalvo = JSON.parse(localStorage.getItem("alunoLogado"));
 const idEstudante = alunoSalvo ? alunoSalvo.id : null;
+
 // Buscar perguntas no servidor
 async function carregarQuiz() {
     try {
@@ -21,19 +25,19 @@ async function carregarQuiz() {
 
         const resposta = await fetch(`/api/quiz/${idQuiz}`);
         const dados = await resposta.json();
-dadosQuiz = dados;
-console.log("Dados do quiz:", dadosQuiz);
-console.log("ID do aluno:", idEstudante);
-console.log("ID do quiz:", idQuiz);
+
         if (!resposta.ok) {
             throw new Error(dados.mensagem);
         }
+
+        dadosQuiz = dados;
 
         tituloQuiz.textContent = dados.quiz.titulo;
         areaPerguntas.innerHTML = "";
 
         if (dados.perguntas.length === 0) {
-            areaPerguntas.textContent = "Este quiz ainda não possui perguntas.";
+            areaPerguntas.textContent =
+                "Este quiz ainda não possui perguntas.";
             return;
         }
 
@@ -42,7 +46,9 @@ console.log("ID do quiz:", idQuiz);
             bloco.className = "material";
 
             const enunciado = document.createElement("h3");
-            enunciado.textContent = `${indice + 1}. ${pergunta.enunciado}`;
+            enunciado.textContent =
+                `${indice + 1}. ${pergunta.enunciado}`;
+
             bloco.appendChild(enunciado);
 
             const alternativas = [
@@ -53,22 +59,44 @@ console.log("ID do quiz:", idQuiz);
             ];
 
             alternativas.forEach(([letra, texto]) => {
-                const label = document.createElement("label");
-                label.style.display = "block";
-                label.style.margin = "12px 0";
+                const alternativa = document.createElement("button");
 
-                const radio = document.createElement("input");
-                radio.type = "radio";
-                radio.name = `pergunta-${pergunta.id_pergunta}`;
-                radio.value = letra;
-                radio.required = true;
+                alternativa.type = "button";
+                alternativa.className = "alternativa-quiz";
+                alternativa.textContent = `${letra}) ${texto}`;
+                alternativa.dataset.letra = letra;
+                alternativa.dataset.pergunta = pergunta.id_pergunta;
 
-                label.appendChild(radio);
-                label.appendChild(
-                    document.createTextNode(` ${letra}) ${texto}`)
-                );
+                alternativa.style.display = "block";
+                alternativa.style.width = "100%";
+                alternativa.style.padding = "14px";
+                alternativa.style.margin = "10px 0";
+                alternativa.style.textAlign = "left";
+                alternativa.style.background = "#ffffff";
+                alternativa.style.border = "1px solid #d5d5d5";
+                alternativa.style.borderRadius = "8px";
+                alternativa.style.cursor = "pointer";
+                alternativa.style.fontSize = "15px";
+                alternativa.style.color = "#333";
 
-                bloco.appendChild(label);
+                alternativa.addEventListener("click", () => {
+                    // Remover seleção anterior da mesma pergunta
+                    bloco.querySelectorAll(".alternativa-quiz")
+                        .forEach(botao => {
+                            botao.classList.remove("selecionada");
+                            botao.style.background = "#ffffff";
+                            botao.style.border = "1px solid #d5d5d5";
+                            botao.style.color = "#333";
+                        });
+
+                    // Marcar alternativa escolhida
+                    alternativa.classList.add("selecionada");
+                    alternativa.style.background = "#e8f0fe";
+                    alternativa.style.border = "2px solid #174ea6";
+                    alternativa.style.color = "#174ea6";
+                });
+
+                bloco.appendChild(alternativa);
             });
 
             areaPerguntas.appendChild(bloco);
@@ -83,11 +111,12 @@ console.log("ID do quiz:", idQuiz);
 
     } catch (erro) {
         console.error(erro);
-        areaPerguntas.textContent = erro.message || "Erro ao carregar quiz.";
+        areaPerguntas.textContent =
+            erro.message || "Erro ao carregar quiz.";
     }
 }
 
-// Verificar se todas as perguntas foram respondidas
+// Finalizar e corrigir o quiz
 async function finalizarQuiz() {
     if (!idEstudante) {
         mensagemQuiz.textContent =
@@ -103,7 +132,7 @@ async function finalizarQuiz() {
 
     for (const bloco of blocos) {
         const selecionada = bloco.querySelector(
-            'input[type="radio"]:checked'
+            ".alternativa-quiz.selecionada"
         );
 
         if (!selecionada) {
@@ -112,14 +141,9 @@ async function finalizarQuiz() {
             return;
         }
 
-        const idPergunta = selecionada.name.replace(
-            "pergunta-",
-            ""
-        );
-
         respostas.push({
-            id_pergunta: Number(idPergunta),
-            alternativa_escolhida: selecionada.value
+            id_pergunta: Number(selecionada.dataset.pergunta),
+            alternativa_escolhida: selecionada.dataset.letra
         });
     }
 
@@ -147,71 +171,95 @@ async function finalizarQuiz() {
 
         mensagemQuiz.textContent = "Quiz finalizado com sucesso!";
 
-      resultadoQuiz.innerHTML = "";
+        resultadoQuiz.innerHTML = "";
 
-const painelResultado = document.createElement("div");
-painelResultado.className = "material";
+        // Painel com a pontuação
+        const painelResultado = document.createElement("div");
+        painelResultado.className = "material";
 
-painelResultado.innerHTML = `
-    <h2>Resultado do Quiz</h2>
-    <h3>Você acertou ${resultado.pontuacao} de ${resultado.total_perguntas} questões!</h3>
-    <p>Pontuação: ${resultado.pontuacao}/${resultado.total_perguntas}</p>
-`;
+        painelResultado.innerHTML = `
+            <h2>Resultado do Quiz</h2>
+            <h3>Você acertou ${resultado.pontuacao} de ${resultado.total_perguntas} questões!</h3>
+            <p>Pontuação: ${resultado.pontuacao}/${resultado.total_perguntas}</p>
+        `;
 
-resultadoQuiz.appendChild(painelResultado);
+        resultadoQuiz.appendChild(painelResultado);
 
-// Mostrar correção e explicação de cada pergunta
-dadosQuiz.perguntas.forEach((pergunta, indice) => {
-    const respostaAluno = respostas.find(
-        resposta => resposta.id_pergunta === pergunta.id_pergunta
-    );
+        // Mostrar correção das alternativas
+        dadosQuiz.perguntas.forEach((pergunta, indice) => {
+            const respostaAluno = respostas.find(
+                resposta =>
+                    resposta.id_pergunta === pergunta.id_pergunta
+            );
 
-    const alternativas = {
-        A: pergunta.alternativa_a,
-        B: pergunta.alternativa_b,
-        C: pergunta.alternativa_c,
-        D: pergunta.alternativa_d
-    };
+            const alternativas = {
+                A: pergunta.alternativa_a,
+                B: pergunta.alternativa_b,
+                C: pergunta.alternativa_c,
+                D: pergunta.alternativa_d
+            };
 
-    const acertou = respostaAluno.alternativa_escolhida === pergunta.resposta_correta;
+            const acertou =
+                respostaAluno.alternativa_escolhida ===
+                pergunta.resposta_correta;
 
-    const bloco = document.createElement("div");
-    bloco.className = "material";
+            const bloco = document.createElement("div");
+            bloco.className = "material";
 
-    const titulo = document.createElement("h3");
-    titulo.textContent = `${indice + 1}. ${pergunta.enunciado}`;
+            const titulo = document.createElement("h3");
+            titulo.textContent =
+                `${indice + 1}. ${pergunta.enunciado}`;
 
-    const situacao = document.createElement("p");
-    situacao.textContent = acertou ? "✓ Você acertou!" : "✗ Você errou!";
-    situacao.style.color = acertou ? "green" : "red";
-    situacao.style.fontWeight = "bold";
+            const situacao = document.createElement("p");
+            situacao.textContent = acertou
+                ? "✓ Você acertou!"
+                : "✗ Você errou!";
 
-    const suaResposta = document.createElement("p");
-    suaResposta.textContent =
-        `Sua resposta: ${respostaAluno.alternativa_escolhida}) ${alternativas[respostaAluno.alternativa_escolhida]}`;
+            situacao.style.color = acertou ? "#16803c" : "#d93025";
+            situacao.style.fontWeight = "bold";
 
-    const respostaCorreta = document.createElement("p");
-    respostaCorreta.textContent =
-        `Resposta correta: ${pergunta.resposta_correta}) ${alternativas[pergunta.resposta_correta]}`;
+            // Exibir alternativas com as cores da correção
+            Object.entries(alternativas).forEach(([letra, texto]) => {
+                const opcao = document.createElement("div");
+                opcao.textContent = `${letra}) ${texto}`;
 
-    const explicacao = document.createElement("p");
-    explicacao.textContent =
-        `Explicação: ${pergunta.explicacao || "Não há explicação cadastrada para esta questão."}`;
+                opcao.style.padding = "12px";
+                opcao.style.margin = "8px 0";
+                opcao.style.borderRadius = "8px";
+                opcao.style.border = "1px solid #d5d5d5";
 
-    bloco.appendChild(titulo);
-    bloco.appendChild(situacao);
-    bloco.appendChild(suaResposta);
-    bloco.appendChild(respostaCorreta);
-    bloco.appendChild(explicacao);
+                if (letra === pergunta.resposta_correta) {
+                    opcao.style.background = "#d9f2df";
+                    opcao.style.border = "1px solid #16803c";
+                    opcao.style.color = "#12632f";
+                    opcao.style.fontWeight = "bold";
+                } else if (
+                    letra === respostaAluno.alternativa_escolhida
+                ) {
+                    opcao.style.background = "#fce1e1";
+                    opcao.style.border = "1px solid #d93025";
+                    opcao.style.color = "#b3261e";
+                }
 
-    resultadoQuiz.appendChild(bloco);
-});
+                bloco.appendChild(opcao);
+            });
 
-        areaPerguntas.querySelectorAll("input").forEach(input => {
-            input.disabled = true;
+            const explicacao = document.createElement("p");
+            explicacao.textContent =
+                `Explicação: ${pergunta.explicacao || "Não há explicação cadastrada para esta questão."}`;
+
+            bloco.appendChild(titulo);
+            bloco.appendChild(situacao);
+            bloco.appendChild(explicacao);
+
+            resultadoQuiz.appendChild(bloco);
         });
 
-        areaPerguntas.querySelector("button").disabled = true;
+        // Bloquear alterações após finalizar
+        areaPerguntas.querySelectorAll("button").forEach(botao => {
+            botao.disabled = true;
+            botao.style.cursor = "default";
+        });
 
     } catch (erro) {
         console.error(erro);
@@ -219,4 +267,5 @@ dadosQuiz.perguntas.forEach((pergunta, indice) => {
             erro.message || "Não foi possível finalizar o quiz.";
     }
 }
+
 carregarQuiz();
